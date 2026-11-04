@@ -1,0 +1,11 @@
+{
+  "model": "Qwen/Qwen3-1.7B",
+  "rank": 16,
+  "learning_rate": 0.0002,
+  "epochs": 1,
+  "microbatch_size": 1,
+  "gradient_accumulation_steps": 8,
+  "max_length": 1024,
+  "seed": 42,
+  "max_new_tokens": 256
+}

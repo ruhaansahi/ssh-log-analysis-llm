@@ -1,0 +1,25 @@
+{
+  "python": "3.12.14",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "packages": {
+    "torch": "2.8.0+cu128",
+    "transformers": "4.57.1",
+    "datasets": "4.2.0",
+    "peft": "0.17.1",
+    "trl": "0.23.1",
+    "bitsandbytes": "0.48.1",
+    "mlflow": "3.4.0"
+  },
+  "cuda_available": true,
+  "torch_cuda_version": "12.8",
+  "ram_total_gib": 31.43492889404297,
+  "ram_available_gib": 15.155097961425781,
+  "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU",
+  "compute_capability": [
+    12,
+    0
+  ],
+  "memory_total_mib": 12230.5625,
+  "memory_free_mib": 11092.0,
+  "bf16_supported": true
+}

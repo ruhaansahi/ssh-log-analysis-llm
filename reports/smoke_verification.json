@@ -1,0 +1,15 @@
+{
+  "model_revision": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+  "train_incidents": 8,
+  "training_loss": 0.3495509946718812,
+  "training_seconds": 7.204929300001822,
+  "peak_gpu_memory_mib": 2314.0341796875,
+  "trainable_parameters": 8716288,
+  "total_parameters": 1729291264,
+  "base_frozen": true,
+  "adapter_changed": true,
+  "adapter_finite": true,
+  "precision": "torch.bfloat16",
+  "optimizer_steps": 5,
+  "reload_verified": true
+}
