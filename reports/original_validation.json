@@ -1,0 +1,124 @@
+{
+  "incidents": 142,
+  "valid_json_rate": 0.176056338028169,
+  "schema_valid_rate": 0.16901408450704225,
+  "invalid_outputs": 118,
+  "exact_record_accuracy": 0.007042253521126761,
+  "findings_micro": {
+    "precision": 0.7254901960784313,
+    "recall": 0.14015151515151514,
+    "f1": 0.23492063492063492,
+    "tp": 37,
+    "fp": 14,
+    "fn": 227
+  },
+  "findings_macro_f1": 0.27069967425534414,
+  "findings_per_class": {
+    "invalid_user": {
+      "precision": 1.0,
+      "recall": 0.25,
+      "f1": 0.4,
+      "tp": 8,
+      "fp": 0,
+      "fn": 24
+    },
+    "password_authentication_failed": {
+      "precision": 1.0,
+      "recall": 0.19101123595505617,
+      "f1": 0.32075471698113206,
+      "tp": 17,
+      "fp": 0,
+      "fn": 72
+    },
+    "authentication_accepted": {
+      "precision": 1.0,
+      "recall": 0.5454545454545454,
+      "f1": 0.7058823529411765,
+      "tp": 6,
+      "fp": 0,
+      "fn": 5
+    },
+    "too_many_authentication_failures": {
+      "precision": 0.125,
+      "recall": 0.08333333333333333,
+      "f1": 0.1,
+      "tp": 2,
+      "fp": 14,
+      "fn": 22
+    },
+    "connection_closed": {
+      "precision": 1.0,
+      "recall": 0.05128205128205128,
+      "f1": 0.0975609756097561,
+      "tp": 4,
+      "fp": 0,
+      "fn": 74
+    },
+    "insufficient_evidence": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 30
+    }
+  },
+  "field_accuracy": {
+    "connection_outcome": 0.16901408450704225,
+    "source_ip": 0.16901408450704225,
+    "server_hostname": 0.16901408450704225,
+    "user": 0.14084507042253522
+  },
+  "canonical_evidence": {
+    "precision": 0.52,
+    "recall": 0.14772727272727273,
+    "f1": 0.23008849557522124,
+    "tp": 39,
+    "fp": 36,
+    "fn": 225
+  },
+  "supported_citation_rate": 0.6133333333333333,
+  "unsupported_finding_rate": 0.09859154929577464,
+  "latency_median_s": 3.1140441249990545,
+  "latency_p95_s": 3.4273591000019223,
+  "reference_note": "Agreement with observable-event annotations; independent expert ground truth is not claimed.",
+  "peak_gpu_memory_mib": 1751.0791015625,
+  "peak_reserved_memory_mib": 2376.0,
+  "model_revision": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+  "precision": "torch.bfloat16",
+  "inference_batch_size": 4,
+  "timing_note": "Amortized batch generation time per incident; not single-request latency",
+  "model": "Qwen/Qwen3-1.7B",
+  "adapter": null,
+  "split": "validation",
+  "dataset_sha256": "17c2c0ad5db69aba0f4ea38619ae371cd2a5450b7b2ea925039ce29638bf792b",
+  "system": "original",
+  "markdown_fenced_outputs": 117,
+  "fence_normalized_content": {
+    "schema_valid_rate": 0.8943661971830986,
+    "exact_record_accuracy": 0.02112676056338028,
+    "findings_micro": {
+      "precision": 0.6377952755905512,
+      "recall": 0.6136363636363636,
+      "f1": 0.6254826254826255,
+      "tp": 162,
+      "fp": 92,
+      "fn": 102
+    },
+    "field_accuracy": {
+      "source_ip": 0.8943661971830986,
+      "server_hostname": 0.8661971830985915,
+      "connection_outcome": 0.7183098591549296,
+      "user": 0.7746478873239436
+    },
+    "canonical_evidence": {
+      "precision": 0.5193370165745856,
+      "recall": 0.7121212121212122,
+      "f1": 0.6006389776357828,
+      "tp": 188,
+      "fp": 174,
+      "fn": 76
+    }
+  },
+  "content_diagnostic_note": "Secondary diagnostic removes only exact outer Markdown JSON fences. Primary strict metrics still count those responses as failures. Defined on validation before final test."
+}
