@@ -22,3 +22,4 @@ build/
 *.log
 reports/*.jsonl
 reports/audit*.json
+reports/github_status.json

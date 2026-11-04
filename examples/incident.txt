@@ -1,0 +1,3 @@
+Nov 04 12:00:00 gateway sshd[101]: Invalid user backup-agent from 192.0.2.10
+Nov 04 12:00:02 gateway sshd[101]: Failed password for invalid user backup-agent from 192.0.2.10 port 43210 ssh2
+Nov 04 12:00:03 gateway sshd[101]: Connection closed by 192.0.2.10 [preauth]

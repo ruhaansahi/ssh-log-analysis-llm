@@ -1,0 +1,14 @@
+{
+  "pytest": {
+    "passed": 29,
+    "failed": 0
+  },
+  "source_compile_check": "passed",
+  "uv_lock_check": "passed",
+  "locked_environment_sync": "passed",
+  "editable_package_metadata_present": true,
+  "gpu_cli_demo_matches_expected_record": true,
+  "gpu_cli_stdout_is_valid_json": true,
+  "demo_schema_valid": true,
+  "documentation": "project-facing README, methodology, annotation rubric, and measured results"
+}

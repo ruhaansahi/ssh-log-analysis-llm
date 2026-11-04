@@ -1,0 +1,39 @@
+{
+  "predictions": [
+    {
+      "id": "cad8c980f1773de729b4",
+      "raw": "{\"user\":\"backup-agent\",\"source_ip\":\"192.0.2.10\",\"connection_outcome\":\"failure\",\"findings\":[\"invalid_user\",\"password_authentication_failed\",\"connection_closed\"],\"evidence_line_ids\":[\"L1\",\"L2\",\"L3\"],\"server_hostname\":\"gateway\"}",
+      "latency_s": 7.570173100015381,
+      "batch_latency_s": 7.570173100015381,
+      "generated_tokens": 59,
+      "answer": {
+        "user": "backup-agent",
+        "source_ip": "192.0.2.10",
+        "connection_outcome": "failure",
+        "findings": [
+          "invalid_user",
+          "password_authentication_failed",
+          "connection_closed"
+        ],
+        "evidence_line_ids": [
+          "L1",
+          "L2",
+          "L3"
+        ],
+        "server_hostname": "gateway"
+      },
+      "valid_json": true,
+      "schema_valid": true,
+      "validation_errors": []
+    }
+  ],
+  "resources": {
+    "peak_gpu_memory_mib": 1420.4443359375,
+    "peak_reserved_memory_mib": 2408.0,
+    "model_revision": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+    "precision": "torch.bfloat16",
+    "inference_batch_size": 1,
+    "timing_note": "Sequential generation latency"
+  },
+  "unparsed_lines": 0
+}
