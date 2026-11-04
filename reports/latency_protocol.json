@@ -1,0 +1,32 @@
+{
+  "defined_at_utc": "2026-11-04T18:57:39.092865+00:00",
+  "dataset_sha256": "17c2c0ad5db69aba0f4ea38619ae371cd2a5450b7b2ea925039ce29638bf792b",
+  "incidents": 20,
+  "incident_ids": [
+    "aae3bfb25bc479c4655b",
+    "2e8ec8ac1ee92d3e29cf",
+    "22a28a22fdb5d50c75f8",
+    "048840ae65fa58067dca",
+    "cc4693d2432e817a3d7b",
+    "437dc8e59587bae7b0a7",
+    "52b7a51801e2efa5fd3e",
+    "eb9acef6b2c51e295252",
+    "086a6768a03ea39cc2f6",
+    "b49684ab8290b1dac283",
+    "7c690d9c5be95f40d23a",
+    "97a13c3900d86f4d89c4",
+    "b1d0057c8c086aed23da",
+    "9123fe553af5cc5393f9",
+    "4c0ddc5a62c876a5a431",
+    "32768aaddbb8362a3d24",
+    "b4c6f03136d503296d4d",
+    "b35b66c1558379bc0afe",
+    "be3d2b3e1b19bff254ee",
+    "ed00f9d9b9916a83c353"
+  ],
+  "selection_rule": "Last 20 incidents in the existing frozen test order; no selection by labels, errors, or observed timings.",
+  "original_progress_when_defined": "60/93 incidents reported complete; selected window is incidents 74 through 93.",
+  "power_line_status": "Online",
+  "power_note": "AC confirmed before the selected window; both systems use batch size 1. Full original-model test includes earlier battery operation.",
+  "purpose": "Paired same-power latency comparison without repeating accuracy tests or changing model selection."
+}

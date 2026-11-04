@@ -1,0 +1,124 @@
+{
+  "incidents": 142,
+  "valid_json_rate": 1.0,
+  "schema_valid_rate": 1.0,
+  "invalid_outputs": 0,
+  "exact_record_accuracy": 0.9929577464788732,
+  "findings_micro": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "tp": 264,
+    "fp": 0,
+    "fn": 0
+  },
+  "findings_macro_f1": 1.0,
+  "findings_per_class": {
+    "invalid_user": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "tp": 32,
+      "fp": 0,
+      "fn": 0
+    },
+    "password_authentication_failed": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "tp": 89,
+      "fp": 0,
+      "fn": 0
+    },
+    "authentication_accepted": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "tp": 11,
+      "fp": 0,
+      "fn": 0
+    },
+    "too_many_authentication_failures": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "tp": 24,
+      "fp": 0,
+      "fn": 0
+    },
+    "connection_closed": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "tp": 78,
+      "fp": 0,
+      "fn": 0
+    },
+    "insufficient_evidence": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "tp": 30,
+      "fp": 0,
+      "fn": 0
+    }
+  },
+  "field_accuracy": {
+    "server_hostname": 1.0,
+    "user": 0.9929577464788732,
+    "source_ip": 1.0,
+    "connection_outcome": 1.0
+  },
+  "canonical_evidence": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "tp": 264,
+    "fp": 0,
+    "fn": 0
+  },
+  "supported_citation_rate": 1.0,
+  "unsupported_finding_rate": 0.0,
+  "latency_median_s": 3.317175775002397,
+  "latency_p95_s": 3.6984151500000735,
+  "reference_note": "Agreement with observable-event annotations; independent expert ground truth is not claimed.",
+  "peak_gpu_memory_mib": 1913.1640625,
+  "peak_reserved_memory_mib": 2484.0,
+  "model_revision": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+  "precision": "torch.bfloat16",
+  "inference_batch_size": 4,
+  "timing_note": "Amortized batch generation time per incident; not single-request latency",
+  "model": "Qwen/Qwen3-1.7B",
+  "adapter": "artifacts\\rank-8\\adapter",
+  "split": "validation",
+  "dataset_sha256": "17c2c0ad5db69aba0f4ea38619ae371cd2a5450b7b2ea925039ce29638bf792b",
+  "system": "adapter",
+  "markdown_fenced_outputs": 0,
+  "fence_normalized_content": {
+    "schema_valid_rate": 1.0,
+    "exact_record_accuracy": 0.9929577464788732,
+    "findings_micro": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "tp": 264,
+      "fp": 0,
+      "fn": 0
+    },
+    "field_accuracy": {
+      "server_hostname": 1.0,
+      "user": 0.9929577464788732,
+      "source_ip": 1.0,
+      "connection_outcome": 1.0
+    },
+    "canonical_evidence": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "tp": 264,
+      "fp": 0,
+      "fn": 0
+    }
+  },
+  "content_diagnostic_note": "Secondary diagnostic removes only exact outer Markdown JSON fences. Primary strict metrics still count those responses as failures. Defined on validation before final test."
+}

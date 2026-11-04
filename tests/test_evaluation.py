@@ -66,3 +66,11 @@ def test_duplicate_predictions_raise(row):
 def test_schema_rejects_duplicate_findings(row):
     answer = {**row["answer"], "findings": ["invalid_user", "invalid_user"]}
     assert validate_answer(answer)
+
+
+def test_p95_uses_nearest_rank_for_twenty_observations(row):
+    rows = [{**row, "id": str(index)} for index in range(20)]
+    predictions = [{"id": r["id"], "raw": json.dumps(r["answer"]), "latency_s": index}
+                   for index, r in enumerate(rows)]
+    metrics, _ = score_predictions(rows, predictions)
+    assert metrics["latency_p95_s"] == 18

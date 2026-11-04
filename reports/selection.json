@@ -1,0 +1,10 @@
+{
+  "rank": 8,
+  "adapter": "artifacts\\rank-8\\adapter",
+  "dataset_sha256": "17c2c0ad5db69aba0f4ea38619ae371cd2a5450b7b2ea925039ce29638bf792b",
+  "criterion": "validation exact-record accuracy, then finding F1, schema validity, validation loss",
+  "candidate_ranks": [
+    16,
+    8
+  ]
+}

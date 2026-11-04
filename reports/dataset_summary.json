@@ -1,0 +1,68 @@
+{
+  "model": "Qwen/Qwen3-1.7B",
+  "max_length": 1024,
+  "counts": {
+    "train": 1599,
+    "validation": 142,
+    "test": 93
+  },
+  "partition_hashes": {
+    "train": "ed76edbffa2ae005ee333aa7317b225b0a34280e755a4fdb8c7febf13d9090fd",
+    "validation": "6f1d7c628ca85101f30bb4c6eed7bccde1bb4d29b18d5e3e18a46c358ee71b69",
+    "test": "50b6ed1f5fc7e0bbc72557499c6ec814c0b0bfa8c8bbab2b3bd7187df3c33b1a"
+  },
+  "dataset_sha256": "17c2c0ad5db69aba0f4ea38619ae371cd2a5450b7b2ea925039ce29638bf792b",
+  "partition_profile": {
+    "train": {
+      "originals": 1330,
+      "augmented": 269,
+      "outcomes": {
+        "failure": 1239,
+        "unknown": 303,
+        "success": 57
+      },
+      "findings": {
+        "password_authentication_failed": 1196,
+        "connection_closed": 1050,
+        "invalid_user": 463,
+        "insufficient_evidence": 201,
+        "too_many_authentication_failures": 250,
+        "authentication_accepted": 57
+      }
+    },
+    "validation": {
+      "originals": 142,
+      "augmented": 0,
+      "outcomes": {
+        "failure": 95,
+        "unknown": 36,
+        "success": 11
+      },
+      "findings": {
+        "password_authentication_failed": 89,
+        "too_many_authentication_failures": 24,
+        "connection_closed": 78,
+        "invalid_user": 32,
+        "insufficient_evidence": 30,
+        "authentication_accepted": 11
+      }
+    },
+    "test": {
+      "originals": 93,
+      "augmented": 0,
+      "outcomes": {
+        "failure": 54,
+        "success": 10,
+        "unknown": 29
+      },
+      "findings": {
+        "insufficient_evidence": 20,
+        "password_authentication_failed": 51,
+        "connection_closed": 51,
+        "too_many_authentication_failures": 12,
+        "invalid_user": 19,
+        "authentication_accepted": 10
+      }
+    }
+  }
+}

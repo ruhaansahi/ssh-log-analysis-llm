@@ -64,10 +64,10 @@
     }
   },
   "field_accuracy": {
-    "connection_outcome": 0.16901408450704225,
-    "source_ip": 0.16901408450704225,
     "server_hostname": 0.16901408450704225,
-    "user": 0.14084507042253522
+    "user": 0.14084507042253522,
+    "source_ip": 0.16901408450704225,
+    "connection_outcome": 0.16901408450704225
   },
   "canonical_evidence": {
     "precision": 0.52,
@@ -106,10 +106,10 @@
       "fn": 102
     },
     "field_accuracy": {
-      "source_ip": 0.8943661971830986,
       "server_hostname": 0.8661971830985915,
-      "connection_outcome": 0.7183098591549296,
-      "user": 0.7746478873239436
+      "user": 0.7746478873239436,
+      "source_ip": 0.8943661971830986,
+      "connection_outcome": 0.7183098591549296
     },
     "canonical_evidence": {
       "precision": 0.5193370165745856,

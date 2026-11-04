@@ -1,0 +1,13 @@
+{
+  "frozen_partition_hashes_match": true,
+  "all_final_primary_and_secondary_scores_recomputed_identically": true,
+  "identical_93_test_ids_for_all_systems": true,
+  "matching_model_revision": true,
+  "matching_test_batch_size": 1,
+  "selected_adapter_matches_measured_adapter": true,
+  "selected_adapter_reload_demonstrated_by_full_test_inference": true,
+  "training_base_frozen": true,
+  "training_adapter_changed": true,
+  "training_adapter_finite": true,
+  "dataset_sha256": "17c2c0ad5db69aba0f4ea38619ae371cd2a5450b7b2ea925039ce29638bf792b"
+}

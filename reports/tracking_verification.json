@@ -1,0 +1,10 @@
+{
+  "comparison_run_id": "ffb644f499754cb7bc0209b543f89c19",
+  "selected_training_run_id": "aaee48926d264ffcba03ddd59d84fa19",
+  "comparison_status": "FINISHED",
+  "selected_training_status": "FINISHED",
+  "comparison_metric_count": 256,
+  "selected_test_finding_f1": 1.0,
+  "paired_ac_latency_logged": true,
+  "dataset_version_matches": true
+}

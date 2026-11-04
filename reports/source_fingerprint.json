@@ -1,0 +1,21 @@
+{
+  "files": {
+    "src/ssh_log_analysis/__init__.py": "b24cffb9c859ad5bde34a75a74e665b331f4ee2907cc4112797bfdacc21c1282",
+    "src/ssh_log_analysis/__main__.py": "3129adff95e0f38b87ab34cddfc27082c7892bcaec267ff5d40f160fdf55b44a",
+    "src/ssh_log_analysis/cli.py": "5902f6ad382300b48cf119b32ef24c9398bd63709fced42c71d466a589b23b9e",
+    "src/ssh_log_analysis/data.py": "e343ab3e68d26dc5ae71f316e52846e9588a7678c0dc087912cb0093e128e926",
+    "src/ssh_log_analysis/evaluation.py": "fb6af927c49cce7333296a4965390bad654d902fe082a09af9560db09211f72d",
+    "src/ssh_log_analysis/experiment.py": "99c6d3583e9ee59bfd687a123871a066a120db29934a88c23b4b9c1bb469be00",
+    "src/ssh_log_analysis/modeling.py": "e2a35f343c063f1fefb22041d8f05e18795349b66629194bc32e627c3bdd4f7e",
+    "src/ssh_log_analysis/prompts.py": "55cf161feb4cf542b7a125a9ccd1ca56cb29d9658f4b441ca9600748da9c0707",
+    "src/ssh_log_analysis/reporting.py": "71f8f0ccef925bb84cfd58a5038273409d2d660e9ebf8b3894149788d61ee166",
+    "src/ssh_log_analysis/schema.py": "a9db61f6e9a3ab3f0046edc31706836c2cf50c25fe47d310a9e333632a1c4f9a",
+    "src/ssh_log_analysis/storage.py": "262ce7b60316ecbeccf065a3ccc09096d1ab7183207f3a7a746f3e6e934c3038",
+    "configs/train.json": "3ac946312ed10760e3cc489c18a62e8e00e8fc4d639ce6ef2983b2396c5a4e1a",
+    "pyproject.toml": "e968024667363e914dc2dc987faaeb212108fc83c2544dd098a1ef0351e461cf",
+    "uv.lock": "6378952a9492316bc98d642870a6387d4ec92a783ba0366a79a0a3fe6f860dbb"
+  },
+  "sha256": "495ff081acd2067e47e1c09bbe3738e0de77bce9bf67a29569d9a32a1fd58685",
+  "git_commit_at_run": "23cfe74ebdf06dde4f3149c9c71129923a8ddadb",
+  "uncommitted_implementation": true
+}

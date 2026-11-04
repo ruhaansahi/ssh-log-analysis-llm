@@ -1,0 +1,8 @@
+{
+  "secondary_diagnostic_defined_before_test": true,
+  "rule": "Remove exact outer Markdown fences only; strict primary score unchanged",
+  "files": {
+    "src\\ssh_log_analysis\\evaluation.py": "a7f5299597c9857bbec1cfc46547af9f2865cccddc88a6678f4ede08a86b3343",
+    "src\\ssh_log_analysis\\reporting.py": "5e680fc3798605fade97074d042a29e62fbf4bc8cb3b8712c482de43604f0f86"
+  }
+}

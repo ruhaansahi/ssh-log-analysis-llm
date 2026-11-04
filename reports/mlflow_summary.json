@@ -1,0 +1,11 @@
+{
+  "comparison_run_id": "ffb644f499754cb7bc0209b543f89c19",
+  "training_run_ids": {
+    "16": "ce189baed238481dbd5a2e2df18a7427",
+    "8": "aaee48926d264ffcba03ddd59d84fa19"
+  },
+  "dataset_sha256": "17c2c0ad5db69aba0f4ea38619ae371cd2a5450b7b2ea925039ce29638bf792b",
+  "metrics_sha256": "374d2ed5773ab4cd761c27c791a9e547142cdbf353baab610b3633cd9b2867df",
+  "tracking_storage": "local ./mlruns",
+  "selected_rank": 8
+}

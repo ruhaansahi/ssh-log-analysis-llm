@@ -1,0 +1,19 @@
+{
+  "partition_integrity": {
+    "train": true,
+    "validation": true,
+    "test": true
+  },
+  "dataset_sha256": "17c2c0ad5db69aba0f4ea38619ae371cd2a5450b7b2ea925039ce29638bf792b",
+  "validation_primary_scores_unchanged": true,
+  "refreshed": [
+    "reports\\original_validation.json",
+    "reports\\rank_16_validation.json",
+    "reports\\rank_8_validation.json",
+    "reports\\rules_validation.json"
+  ],
+  "completed_training_ranks": [
+    16,
+    8
+  ]
+}

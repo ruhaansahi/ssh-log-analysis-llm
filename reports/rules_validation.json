@@ -64,10 +64,10 @@
     }
   },
   "field_accuracy": {
-    "source_ip": 1.0,
     "server_hostname": 1.0,
-    "connection_outcome": 1.0,
-    "user": 1.0
+    "user": 1.0,
+    "source_ip": 1.0,
+    "connection_outcome": 1.0
   },
   "canonical_evidence": {
     "precision": 1.0,
@@ -95,10 +95,10 @@
       "fn": 0
     },
     "field_accuracy": {
-      "source_ip": 1.0,
       "server_hostname": 1.0,
-      "connection_outcome": 1.0,
-      "user": 1.0
+      "user": 1.0,
+      "source_ip": 1.0,
+      "connection_outcome": 1.0
     },
     "canonical_evidence": {
       "precision": 1.0,

@@ -1,0 +1,39 @@
+{
+  "incidents": 20,
+  "dataset_sha256": "17c2c0ad5db69aba0f4ea38619ae371cd2a5450b7b2ea925039ce29638bf792b",
+  "incident_ids": [
+    "aae3bfb25bc479c4655b",
+    "2e8ec8ac1ee92d3e29cf",
+    "22a28a22fdb5d50c75f8",
+    "048840ae65fa58067dca",
+    "cc4693d2432e817a3d7b",
+    "437dc8e59587bae7b0a7",
+    "52b7a51801e2efa5fd3e",
+    "eb9acef6b2c51e295252",
+    "086a6768a03ea39cc2f6",
+    "b49684ab8290b1dac283",
+    "7c690d9c5be95f40d23a",
+    "97a13c3900d86f4d89c4",
+    "b1d0057c8c086aed23da",
+    "9123fe553af5cc5393f9",
+    "4c0ddc5a62c876a5a431",
+    "32768aaddbb8362a3d24",
+    "b4c6f03136d503296d4d",
+    "b35b66c1558379bc0afe",
+    "be3d2b3e1b19bff254ee",
+    "ed00f9d9b9916a83c353"
+  ],
+  "protocol": "latency_protocol.json",
+  "systems": {
+    "original": {
+      "median_s": 8.761409750004532,
+      "p95_s": 11.768376599997282,
+      "mean_generated_tokens": 94
+    },
+    "adapter": {
+      "median_s": 7.206804750006995,
+      "p95_s": 9.970193699991796,
+      "mean_generated_tokens": 55.4
+    }
+  }
+}

@@ -2,6 +2,7 @@
 
 from collections import Counter
 import json
+import math
 from pathlib import Path
 import re
 import statistics
@@ -102,7 +103,7 @@ def score_predictions(rows, predictions, include_content_diagnostic=True):
         "supported_citation_rate": supported_citations / cited if cited else 0.0,
         "unsupported_finding_rate": unsupported / len(rows),
         "latency_median_s": statistics.median(latencies) if latencies else None,
-        "latency_p95_s": sorted(latencies)[min(len(latencies)-1, int(len(latencies)*0.95))] if latencies else None,
+        "latency_p95_s": sorted(latencies)[math.ceil(len(latencies)*0.95)-1] if latencies else None,
         "reference_note": "Agreement with observable-event annotations; independent expert ground truth is not claimed.",
     }
     if include_content_diagnostic:

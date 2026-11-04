@@ -1,0 +1,18 @@
+{
+  "observations": [
+    {
+      "observed_at_utc": "2026-11-04T18:48:32.7277933Z",
+      "phase": "during original-model final test",
+      "power_line_status": "Offline",
+      "battery_fraction": 0.83,
+      "note": "Observed hardware condition, not a controlled power benchmark."
+    },
+    {
+      "observed_at_utc": "2026-11-04T19:01:42.9364079Z",
+      "phase": "adapter final test startup",
+      "power_line_status": "Online",
+      "battery_fraction": 0.83
+    }
+  ],
+  "note": "Full-test original latency includes battery and AC operation; paired comparison uses the fixed final 20 incidents after AC confirmation."
+}
