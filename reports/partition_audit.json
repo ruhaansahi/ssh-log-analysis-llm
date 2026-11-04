@@ -1,0 +1,35 @@
+{
+  "comparisons": {
+    "train__validation": {
+      "id_overlap": 0,
+      "family_id_overlap": 0,
+      "user_overlap_count": 23,
+      "user_right_unique_count": 42,
+      "source_ip_overlap_count": 73,
+      "source_ip_right_unique_count": 129,
+      "server_hostname_overlap_count": 1,
+      "server_hostname_right_unique_count": 1
+    },
+    "train__test": {
+      "id_overlap": 0,
+      "family_id_overlap": 0,
+      "user_overlap_count": 17,
+      "user_right_unique_count": 27,
+      "source_ip_overlap_count": 45,
+      "source_ip_right_unique_count": 82,
+      "server_hostname_overlap_count": 1,
+      "server_hostname_right_unique_count": 1
+    },
+    "validation__test": {
+      "id_overlap": 0,
+      "family_id_overlap": 0,
+      "user_overlap_count": 10,
+      "user_right_unique_count": 27,
+      "source_ip_overlap_count": 17,
+      "source_ip_right_unique_count": 82,
+      "server_hostname_overlap_count": 1,
+      "server_hostname_right_unique_count": 1
+    }
+  },
+  "note": "Zero duplicate/family overlap does not imply unseen-user, unseen-IP, unseen-host, or unseen-template evaluation."
+}

@@ -1,0 +1,10 @@
+{
+  "reviewed": 100,
+  "method": "assisted source inspection plus automated checks",
+  "independent_expert_validation": false,
+  "corrections_before_training": [
+    "IPv4 trailing-colon extraction",
+    "PAM failure outcome"
+  ],
+  "reference_fingerprint": "8229695b55cdf6545ab31d68e3588563a2111c6dde85f7f9097188db2ea0f090"
+}

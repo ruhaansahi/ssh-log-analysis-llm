@@ -1,0 +1,82 @@
+{
+  "raw_sessions": 157611,
+  "deduplicated_groups": 5729,
+  "before_length_filter": {
+    "train": {
+      "incidents": 1799,
+      "originals": 1500,
+      "findings": {
+        "password_authentication_failed": 1396,
+        "connection_closed": 1051,
+        "invalid_user": 663,
+        "insufficient_evidence": 201,
+        "too_many_authentication_failures": 448,
+        "authentication_accepted": 57
+      }
+    },
+    "validation": {
+      "incidents": 150,
+      "originals": 150,
+      "findings": {
+        "password_authentication_failed": 97,
+        "too_many_authentication_failures": 32,
+        "connection_closed": 78,
+        "invalid_user": 40,
+        "insufficient_evidence": 30,
+        "authentication_accepted": 11
+      }
+    },
+    "test": {
+      "incidents": 100,
+      "originals": 100,
+      "findings": {
+        "insufficient_evidence": 20,
+        "password_authentication_failed": 58,
+        "connection_closed": 51,
+        "too_many_authentication_failures": 19,
+        "invalid_user": 26,
+        "authentication_accepted": 10
+      }
+    }
+  },
+  "after_length_filter": {
+    "train": 1599,
+    "validation": 142,
+    "test": 93
+  },
+  "class_counts_after_filter": {
+    "train": {
+      "password_authentication_failed": 1196,
+      "connection_closed": 1050,
+      "invalid_user": 463,
+      "insufficient_evidence": 201,
+      "too_many_authentication_failures": 250,
+      "authentication_accepted": 57
+    },
+    "validation": {
+      "password_authentication_failed": 89,
+      "too_many_authentication_failures": 24,
+      "connection_closed": 78,
+      "invalid_user": 32,
+      "insufficient_evidence": 30,
+      "authentication_accepted": 11
+    },
+    "test": {
+      "insufficient_evidence": 20,
+      "password_authentication_failed": 51,
+      "connection_closed": 51,
+      "too_many_authentication_failures": 12,
+      "invalid_user": 19,
+      "authentication_accepted": 10
+    }
+  },
+  "dataset_sha256": "17c2c0ad5db69aba0f4ea38619ae371cd2a5450b7b2ea925039ce29638bf792b",
+  "source": {
+    "url": "https://zenodo.org/records/8196385/files/SSH.tar.gz?download=1",
+    "source_page": "https://github.com/logpai/loghub/tree/master/OpenSSH",
+    "sha256": "296610a35773f58b7c295e5407fc5ccdf48beb3c544fc14a6309addf904a2712",
+    "bytes": 4596666,
+    "license_note": "Loghub: research/academic use; retain source and paper attribution.",
+    "log_sha256": "89eee9e36c182722f9fadc6e5617a4818ffc66109e7e222b8f9e8b78fc3aa2f3"
+  }
+}
