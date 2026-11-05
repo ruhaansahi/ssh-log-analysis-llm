@@ -1,0 +1,1259 @@
+{
+  "total": 200,
+  "original_dataset_sha256": "17c2c0ad5db69aba0f4ea38619ae371cd2a5450b7b2ea925039ce29638bf792b",
+  "extension_sha256": "00b5ca6da465c4032c9c0fe96382ce80b387005477ee940ff9a65b72f46ca30c",
+  "combined_test_sha256": "1557a7a2925ee29bbf01bae668429e31e9fa94881af20aaf3f431c2f44c174bf",
+  "review_method": "assisted source inspection against observable-event rubric",
+  "independent_human_validation": false,
+  "review": {
+    "reviewed_incidents": 107,
+    "corrected_references": 0,
+    "audit_sha256": "e829569a6200bd76ab09e42d09999b810fe7598349612368fad95540407f1841",
+    "selected_inputs_sha256": "69db136686ea71a87be2637851f272da8b4e84104cec322a169453fbe092208d",
+    "replacement_count": 0,
+    "automated_schema_and_evidence_validation": "passed"
+  },
+  "inventory": {
+    "unused_reserved_candidates": 540,
+    "eligible": 527,
+    "excluded_by_token_length": 13,
+    "unparsed_source_lines": 0
+  },
+  "cohorts": {
+    "original": {
+      "profile": {
+        "incidents": 93,
+        "findings": {
+          "insufficient_evidence": 20,
+          "password_authentication_failed": 51,
+          "connection_closed": 51,
+          "too_many_authentication_failures": 12,
+          "invalid_user": 19,
+          "authentication_accepted": 10
+        },
+        "outcomes": {
+          "failure": 54,
+          "success": 10,
+          "unknown": 29
+        }
+      },
+      "systems": {
+        "rules": {
+          "incidents": 93,
+          "valid_json_rate": 1.0,
+          "schema_valid_rate": 1.0,
+          "invalid_outputs": 0,
+          "exact_record_accuracy": 1.0,
+          "findings_micro": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 163,
+            "fp": 0,
+            "fn": 0
+          },
+          "findings_macro_f1": 1.0,
+          "findings_per_class": {
+            "invalid_user": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 19,
+              "fp": 0,
+              "fn": 0
+            },
+            "password_authentication_failed": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 51,
+              "fp": 0,
+              "fn": 0
+            },
+            "authentication_accepted": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 10,
+              "fp": 0,
+              "fn": 0
+            },
+            "too_many_authentication_failures": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 12,
+              "fp": 0,
+              "fn": 0
+            },
+            "connection_closed": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 51,
+              "fp": 0,
+              "fn": 0
+            },
+            "insufficient_evidence": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 20,
+              "fp": 0,
+              "fn": 0
+            }
+          },
+          "field_accuracy": {
+            "user": 1.0,
+            "connection_outcome": 1.0,
+            "server_hostname": 1.0,
+            "source_ip": 1.0
+          },
+          "canonical_evidence": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 163,
+            "fp": 0,
+            "fn": 0
+          },
+          "supported_citation_rate": 1.0,
+          "unsupported_finding_rate": 0.0,
+          "reference_note": "Agreement with observable-event annotations; independent expert ground truth is not claimed.",
+          "markdown_fenced_outputs": 0,
+          "fence_normalized_content": {
+            "schema_valid_rate": 1.0,
+            "exact_record_accuracy": 1.0,
+            "findings_micro": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 163,
+              "fp": 0,
+              "fn": 0
+            },
+            "field_accuracy": {
+              "user": 1.0,
+              "connection_outcome": 1.0,
+              "server_hostname": 1.0,
+              "source_ip": 1.0
+            },
+            "canonical_evidence": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 163,
+              "fp": 0,
+              "fn": 0
+            }
+          },
+          "content_diagnostic_note": "Secondary diagnostic removes only exact outer Markdown JSON fences. Primary strict metrics still count those responses as failures. Defined on validation before final test."
+        },
+        "original": {
+          "incidents": 93,
+          "valid_json_rate": 0.1827956989247312,
+          "schema_valid_rate": 0.1827956989247312,
+          "invalid_outputs": 76,
+          "exact_record_accuracy": 0.0,
+          "findings_micro": {
+            "precision": 0.6666666666666666,
+            "recall": 0.15950920245398773,
+            "f1": 0.25742574257425743,
+            "tp": 26,
+            "fp": 13,
+            "fn": 137
+          },
+          "findings_macro_f1": 0.22405680739014072,
+          "findings_per_class": {
+            "invalid_user": {
+              "precision": 1.0,
+              "recall": 0.42105263157894735,
+              "f1": 0.5925925925925926,
+              "tp": 8,
+              "fp": 0,
+              "fn": 11
+            },
+            "password_authentication_failed": {
+              "precision": 1.0,
+              "recall": 0.29411764705882354,
+              "f1": 0.45454545454545453,
+              "tp": 15,
+              "fp": 0,
+              "fn": 36
+            },
+            "authentication_accepted": {
+              "precision": 1.0,
+              "recall": 0.1,
+              "f1": 0.18181818181818182,
+              "tp": 1,
+              "fp": 0,
+              "fn": 9
+            },
+            "too_many_authentication_failures": {
+              "precision": 0.07142857142857142,
+              "recall": 0.08333333333333333,
+              "f1": 0.07692307692307693,
+              "tp": 1,
+              "fp": 13,
+              "fn": 11
+            },
+            "connection_closed": {
+              "precision": 1.0,
+              "recall": 0.0196078431372549,
+              "f1": 0.038461538461538464,
+              "tp": 1,
+              "fp": 0,
+              "fn": 50
+            },
+            "insufficient_evidence": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "tp": 0,
+              "fp": 0,
+              "fn": 20
+            }
+          },
+          "field_accuracy": {
+            "user": 0.11827956989247312,
+            "connection_outcome": 0.1827956989247312,
+            "server_hostname": 0.1827956989247312,
+            "source_ip": 0.1827956989247312
+          },
+          "canonical_evidence": {
+            "precision": 0.5,
+            "recall": 0.1901840490797546,
+            "f1": 0.27555555555555555,
+            "tp": 31,
+            "fp": 31,
+            "fn": 132
+          },
+          "supported_citation_rate": 0.5645161290322581,
+          "unsupported_finding_rate": 0.13978494623655913,
+          "reference_note": "Agreement with observable-event annotations; independent expert ground truth is not claimed.",
+          "markdown_fenced_outputs": 76,
+          "fence_normalized_content": {
+            "schema_valid_rate": 0.8817204301075269,
+            "exact_record_accuracy": 0.010752688172043012,
+            "findings_micro": {
+              "precision": 0.6226415094339622,
+              "recall": 0.6073619631901841,
+              "f1": 0.6149068322981367,
+              "tp": 99,
+              "fp": 60,
+              "fn": 64
+            },
+            "field_accuracy": {
+              "user": 0.7311827956989247,
+              "connection_outcome": 0.6774193548387096,
+              "server_hostname": 0.8709677419354839,
+              "source_ip": 0.8817204301075269
+            },
+            "canonical_evidence": {
+              "precision": 0.5336322869955157,
+              "recall": 0.7300613496932515,
+              "f1": 0.616580310880829,
+              "tp": 119,
+              "fp": 104,
+              "fn": 44
+            }
+          },
+          "content_diagnostic_note": "Secondary diagnostic removes only exact outer Markdown JSON fences. Primary strict metrics still count those responses as failures. Defined on validation before final test."
+        },
+        "adapter": {
+          "incidents": 93,
+          "valid_json_rate": 1.0,
+          "schema_valid_rate": 1.0,
+          "invalid_outputs": 0,
+          "exact_record_accuracy": 1.0,
+          "findings_micro": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 163,
+            "fp": 0,
+            "fn": 0
+          },
+          "findings_macro_f1": 1.0,
+          "findings_per_class": {
+            "invalid_user": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 19,
+              "fp": 0,
+              "fn": 0
+            },
+            "password_authentication_failed": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 51,
+              "fp": 0,
+              "fn": 0
+            },
+            "authentication_accepted": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 10,
+              "fp": 0,
+              "fn": 0
+            },
+            "too_many_authentication_failures": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 12,
+              "fp": 0,
+              "fn": 0
+            },
+            "connection_closed": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 51,
+              "fp": 0,
+              "fn": 0
+            },
+            "insufficient_evidence": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 20,
+              "fp": 0,
+              "fn": 0
+            }
+          },
+          "field_accuracy": {
+            "user": 1.0,
+            "connection_outcome": 1.0,
+            "server_hostname": 1.0,
+            "source_ip": 1.0
+          },
+          "canonical_evidence": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 163,
+            "fp": 0,
+            "fn": 0
+          },
+          "supported_citation_rate": 1.0,
+          "unsupported_finding_rate": 0.0,
+          "reference_note": "Agreement with observable-event annotations; independent expert ground truth is not claimed.",
+          "markdown_fenced_outputs": 0,
+          "fence_normalized_content": {
+            "schema_valid_rate": 1.0,
+            "exact_record_accuracy": 1.0,
+            "findings_micro": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 163,
+              "fp": 0,
+              "fn": 0
+            },
+            "field_accuracy": {
+              "user": 1.0,
+              "connection_outcome": 1.0,
+              "server_hostname": 1.0,
+              "source_ip": 1.0
+            },
+            "canonical_evidence": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 163,
+              "fp": 0,
+              "fn": 0
+            }
+          },
+          "content_diagnostic_note": "Secondary diagnostic removes only exact outer Markdown JSON fences. Primary strict metrics still count those responses as failures. Defined on validation before final test."
+        }
+      }
+    },
+    "additional": {
+      "profile": {
+        "incidents": 107,
+        "findings": {
+          "password_authentication_failed": 100,
+          "connection_closed": 69,
+          "invalid_user": 38,
+          "too_many_authentication_failures": 24,
+          "insufficient_evidence": 7
+        },
+        "outcomes": {
+          "failure": 100,
+          "unknown": 7
+        }
+      },
+      "systems": {
+        "rules": {
+          "incidents": 107,
+          "valid_json_rate": 1.0,
+          "schema_valid_rate": 1.0,
+          "invalid_outputs": 0,
+          "exact_record_accuracy": 1.0,
+          "findings_micro": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 238,
+            "fp": 0,
+            "fn": 0
+          },
+          "findings_macro_f1": 1.0,
+          "findings_per_class": {
+            "invalid_user": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 38,
+              "fp": 0,
+              "fn": 0
+            },
+            "password_authentication_failed": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 100,
+              "fp": 0,
+              "fn": 0
+            },
+            "authentication_accepted": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "tp": 0,
+              "fp": 0,
+              "fn": 0
+            },
+            "too_many_authentication_failures": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 24,
+              "fp": 0,
+              "fn": 0
+            },
+            "connection_closed": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 69,
+              "fp": 0,
+              "fn": 0
+            },
+            "insufficient_evidence": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 7,
+              "fp": 0,
+              "fn": 0
+            }
+          },
+          "field_accuracy": {
+            "user": 1.0,
+            "connection_outcome": 1.0,
+            "server_hostname": 1.0,
+            "source_ip": 1.0
+          },
+          "canonical_evidence": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 238,
+            "fp": 0,
+            "fn": 0
+          },
+          "supported_citation_rate": 1.0,
+          "unsupported_finding_rate": 0.0,
+          "reference_note": "Agreement with observable-event annotations; independent expert ground truth is not claimed.",
+          "markdown_fenced_outputs": 0,
+          "fence_normalized_content": {
+            "schema_valid_rate": 1.0,
+            "exact_record_accuracy": 1.0,
+            "findings_micro": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 238,
+              "fp": 0,
+              "fn": 0
+            },
+            "field_accuracy": {
+              "user": 1.0,
+              "connection_outcome": 1.0,
+              "server_hostname": 1.0,
+              "source_ip": 1.0
+            },
+            "canonical_evidence": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 238,
+              "fp": 0,
+              "fn": 0
+            }
+          },
+          "content_diagnostic_note": "Secondary diagnostic removes only exact outer Markdown JSON fences. Primary strict metrics still count those responses as failures. Defined on validation before final test."
+        },
+        "original": {
+          "incidents": 107,
+          "valid_json_rate": 0.24299065420560748,
+          "schema_valid_rate": 0.24299065420560748,
+          "invalid_outputs": 81,
+          "exact_record_accuracy": 0.0,
+          "findings_micro": {
+            "precision": 0.6212121212121212,
+            "recall": 0.1722689075630252,
+            "f1": 0.26973684210526316,
+            "tp": 41,
+            "fp": 25,
+            "fn": 197
+          },
+          "findings_macro_f1": 0.19943087093992526,
+          "findings_per_class": {
+            "invalid_user": {
+              "precision": 0.9285714285714286,
+              "recall": 0.34210526315789475,
+              "f1": 0.5,
+              "tp": 13,
+              "fp": 1,
+              "fn": 25
+            },
+            "password_authentication_failed": {
+              "precision": 1.0,
+              "recall": 0.25,
+              "f1": 0.4,
+              "tp": 25,
+              "fp": 0,
+              "fn": 75
+            },
+            "authentication_accepted": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "tp": 0,
+              "fp": 0,
+              "fn": 0
+            },
+            "too_many_authentication_failures": {
+              "precision": 0.04,
+              "recall": 0.041666666666666664,
+              "f1": 0.04081632653061224,
+              "tp": 1,
+              "fp": 24,
+              "fn": 23
+            },
+            "connection_closed": {
+              "precision": 1.0,
+              "recall": 0.028985507246376812,
+              "f1": 0.056338028169014086,
+              "tp": 2,
+              "fp": 0,
+              "fn": 67
+            },
+            "insufficient_evidence": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "tp": 0,
+              "fp": 0,
+              "fn": 7
+            }
+          },
+          "field_accuracy": {
+            "user": 0.1588785046728972,
+            "connection_outcome": 0.24299065420560748,
+            "server_hostname": 0.24299065420560748,
+            "source_ip": 0.24299065420560748
+          },
+          "canonical_evidence": {
+            "precision": 0.5,
+            "recall": 0.19327731092436976,
+            "f1": 0.2787878787878788,
+            "tp": 46,
+            "fp": 46,
+            "fn": 192
+          },
+          "supported_citation_rate": 0.5978260869565217,
+          "unsupported_finding_rate": 0.22429906542056074,
+          "reference_note": "Agreement with observable-event annotations; independent expert ground truth is not claimed.",
+          "markdown_fenced_outputs": 81,
+          "fence_normalized_content": {
+            "schema_valid_rate": 0.9906542056074766,
+            "exact_record_accuracy": 0.0,
+            "findings_micro": {
+              "precision": 0.6842105263157895,
+              "recall": 0.7100840336134454,
+              "f1": 0.6969072164948453,
+              "tp": 169,
+              "fp": 78,
+              "fn": 69
+            },
+            "field_accuracy": {
+              "user": 0.8317757009345794,
+              "connection_outcome": 0.9345794392523364,
+              "server_hostname": 0.9719626168224299,
+              "source_ip": 0.9813084112149533
+            },
+            "canonical_evidence": {
+              "precision": 0.4887640449438202,
+              "recall": 0.7310924369747899,
+              "f1": 0.5858585858585859,
+              "tp": 174,
+              "fp": 182,
+              "fn": 64
+            }
+          },
+          "content_diagnostic_note": "Secondary diagnostic removes only exact outer Markdown JSON fences. Primary strict metrics still count those responses as failures. Defined on validation before final test."
+        },
+        "adapter": {
+          "incidents": 107,
+          "valid_json_rate": 1.0,
+          "schema_valid_rate": 1.0,
+          "invalid_outputs": 0,
+          "exact_record_accuracy": 0.9813084112149533,
+          "findings_micro": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 238,
+            "fp": 0,
+            "fn": 0
+          },
+          "findings_macro_f1": 1.0,
+          "findings_per_class": {
+            "invalid_user": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 38,
+              "fp": 0,
+              "fn": 0
+            },
+            "password_authentication_failed": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 100,
+              "fp": 0,
+              "fn": 0
+            },
+            "authentication_accepted": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "tp": 0,
+              "fp": 0,
+              "fn": 0
+            },
+            "too_many_authentication_failures": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 24,
+              "fp": 0,
+              "fn": 0
+            },
+            "connection_closed": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 69,
+              "fp": 0,
+              "fn": 0
+            },
+            "insufficient_evidence": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 7,
+              "fp": 0,
+              "fn": 0
+            }
+          },
+          "field_accuracy": {
+            "user": 0.9906542056074766,
+            "connection_outcome": 1.0,
+            "server_hostname": 1.0,
+            "source_ip": 0.9906542056074766
+          },
+          "canonical_evidence": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 238,
+            "fp": 0,
+            "fn": 0
+          },
+          "supported_citation_rate": 1.0,
+          "unsupported_finding_rate": 0.0,
+          "reference_note": "Agreement with observable-event annotations; independent expert ground truth is not claimed.",
+          "markdown_fenced_outputs": 0,
+          "fence_normalized_content": {
+            "schema_valid_rate": 1.0,
+            "exact_record_accuracy": 0.9813084112149533,
+            "findings_micro": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 238,
+              "fp": 0,
+              "fn": 0
+            },
+            "field_accuracy": {
+              "user": 0.9906542056074766,
+              "connection_outcome": 1.0,
+              "server_hostname": 1.0,
+              "source_ip": 0.9906542056074766
+            },
+            "canonical_evidence": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 238,
+              "fp": 0,
+              "fn": 0
+            }
+          },
+          "content_diagnostic_note": "Secondary diagnostic removes only exact outer Markdown JSON fences. Primary strict metrics still count those responses as failures. Defined on validation before final test."
+        }
+      }
+    },
+    "combined": {
+      "profile": {
+        "incidents": 200,
+        "findings": {
+          "insufficient_evidence": 27,
+          "password_authentication_failed": 151,
+          "connection_closed": 120,
+          "too_many_authentication_failures": 36,
+          "invalid_user": 57,
+          "authentication_accepted": 10
+        },
+        "outcomes": {
+          "failure": 154,
+          "success": 10,
+          "unknown": 36
+        }
+      },
+      "systems": {
+        "rules": {
+          "incidents": 200,
+          "valid_json_rate": 1.0,
+          "schema_valid_rate": 1.0,
+          "invalid_outputs": 0,
+          "exact_record_accuracy": 1.0,
+          "findings_micro": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 401,
+            "fp": 0,
+            "fn": 0
+          },
+          "findings_macro_f1": 1.0,
+          "findings_per_class": {
+            "invalid_user": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 57,
+              "fp": 0,
+              "fn": 0
+            },
+            "password_authentication_failed": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 151,
+              "fp": 0,
+              "fn": 0
+            },
+            "authentication_accepted": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 10,
+              "fp": 0,
+              "fn": 0
+            },
+            "too_many_authentication_failures": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 36,
+              "fp": 0,
+              "fn": 0
+            },
+            "connection_closed": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 120,
+              "fp": 0,
+              "fn": 0
+            },
+            "insufficient_evidence": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 27,
+              "fp": 0,
+              "fn": 0
+            }
+          },
+          "field_accuracy": {
+            "user": 1.0,
+            "connection_outcome": 1.0,
+            "server_hostname": 1.0,
+            "source_ip": 1.0
+          },
+          "canonical_evidence": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 401,
+            "fp": 0,
+            "fn": 0
+          },
+          "supported_citation_rate": 1.0,
+          "unsupported_finding_rate": 0.0,
+          "reference_note": "Agreement with observable-event annotations; independent expert ground truth is not claimed.",
+          "markdown_fenced_outputs": 0,
+          "fence_normalized_content": {
+            "schema_valid_rate": 1.0,
+            "exact_record_accuracy": 1.0,
+            "findings_micro": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 401,
+              "fp": 0,
+              "fn": 0
+            },
+            "field_accuracy": {
+              "user": 1.0,
+              "connection_outcome": 1.0,
+              "server_hostname": 1.0,
+              "source_ip": 1.0
+            },
+            "canonical_evidence": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 401,
+              "fp": 0,
+              "fn": 0
+            }
+          },
+          "content_diagnostic_note": "Secondary diagnostic removes only exact outer Markdown JSON fences. Primary strict metrics still count those responses as failures. Defined on validation before final test."
+        },
+        "original": {
+          "incidents": 200,
+          "valid_json_rate": 0.215,
+          "schema_valid_rate": 0.215,
+          "invalid_outputs": 157,
+          "exact_record_accuracy": 0.0,
+          "findings_micro": {
+            "precision": 0.638095238095238,
+            "recall": 0.16708229426433915,
+            "f1": 0.2648221343873518,
+            "tp": 67,
+            "fp": 38,
+            "fn": 334
+          },
+          "findings_macro_f1": 0.20573762335265222,
+          "findings_per_class": {
+            "invalid_user": {
+              "precision": 0.9545454545454546,
+              "recall": 0.3684210526315789,
+              "f1": 0.5316455696202531,
+              "tp": 21,
+              "fp": 1,
+              "fn": 36
+            },
+            "password_authentication_failed": {
+              "precision": 1.0,
+              "recall": 0.26490066225165565,
+              "f1": 0.418848167539267,
+              "tp": 40,
+              "fp": 0,
+              "fn": 111
+            },
+            "authentication_accepted": {
+              "precision": 1.0,
+              "recall": 0.1,
+              "f1": 0.18181818181818182,
+              "tp": 1,
+              "fp": 0,
+              "fn": 9
+            },
+            "too_many_authentication_failures": {
+              "precision": 0.05128205128205128,
+              "recall": 0.05555555555555555,
+              "f1": 0.05333333333333334,
+              "tp": 2,
+              "fp": 37,
+              "fn": 34
+            },
+            "connection_closed": {
+              "precision": 1.0,
+              "recall": 0.025,
+              "f1": 0.04878048780487805,
+              "tp": 3,
+              "fp": 0,
+              "fn": 117
+            },
+            "insufficient_evidence": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "tp": 0,
+              "fp": 0,
+              "fn": 27
+            }
+          },
+          "field_accuracy": {
+            "user": 0.14,
+            "connection_outcome": 0.215,
+            "server_hostname": 0.215,
+            "source_ip": 0.215
+          },
+          "canonical_evidence": {
+            "precision": 0.5,
+            "recall": 0.19201995012468828,
+            "f1": 0.2774774774774775,
+            "tp": 77,
+            "fp": 77,
+            "fn": 324
+          },
+          "supported_citation_rate": 0.5844155844155844,
+          "unsupported_finding_rate": 0.185,
+          "reference_note": "Agreement with observable-event annotations; independent expert ground truth is not claimed.",
+          "markdown_fenced_outputs": 157,
+          "fence_normalized_content": {
+            "schema_valid_rate": 0.94,
+            "exact_record_accuracy": 0.005,
+            "findings_micro": {
+              "precision": 0.6600985221674877,
+              "recall": 0.6683291770573566,
+              "f1": 0.6641883519206939,
+              "tp": 268,
+              "fp": 138,
+              "fn": 133
+            },
+            "field_accuracy": {
+              "user": 0.785,
+              "connection_outcome": 0.815,
+              "server_hostname": 0.925,
+              "source_ip": 0.935
+            },
+            "canonical_evidence": {
+              "precision": 0.5060449050086355,
+              "recall": 0.7306733167082294,
+              "f1": 0.5979591836734693,
+              "tp": 293,
+              "fp": 286,
+              "fn": 108
+            }
+          },
+          "content_diagnostic_note": "Secondary diagnostic removes only exact outer Markdown JSON fences. Primary strict metrics still count those responses as failures. Defined on validation before final test."
+        },
+        "adapter": {
+          "incidents": 200,
+          "valid_json_rate": 1.0,
+          "schema_valid_rate": 1.0,
+          "invalid_outputs": 0,
+          "exact_record_accuracy": 0.99,
+          "findings_micro": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 401,
+            "fp": 0,
+            "fn": 0
+          },
+          "findings_macro_f1": 1.0,
+          "findings_per_class": {
+            "invalid_user": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 57,
+              "fp": 0,
+              "fn": 0
+            },
+            "password_authentication_failed": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 151,
+              "fp": 0,
+              "fn": 0
+            },
+            "authentication_accepted": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 10,
+              "fp": 0,
+              "fn": 0
+            },
+            "too_many_authentication_failures": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 36,
+              "fp": 0,
+              "fn": 0
+            },
+            "connection_closed": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 120,
+              "fp": 0,
+              "fn": 0
+            },
+            "insufficient_evidence": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 27,
+              "fp": 0,
+              "fn": 0
+            }
+          },
+          "field_accuracy": {
+            "user": 0.995,
+            "connection_outcome": 1.0,
+            "server_hostname": 1.0,
+            "source_ip": 0.995
+          },
+          "canonical_evidence": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1": 1.0,
+            "tp": 401,
+            "fp": 0,
+            "fn": 0
+          },
+          "supported_citation_rate": 1.0,
+          "unsupported_finding_rate": 0.0,
+          "reference_note": "Agreement with observable-event annotations; independent expert ground truth is not claimed.",
+          "markdown_fenced_outputs": 0,
+          "fence_normalized_content": {
+            "schema_valid_rate": 1.0,
+            "exact_record_accuracy": 0.99,
+            "findings_micro": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 401,
+              "fp": 0,
+              "fn": 0
+            },
+            "field_accuracy": {
+              "user": 0.995,
+              "connection_outcome": 1.0,
+              "server_hostname": 1.0,
+              "source_ip": 0.995
+            },
+            "canonical_evidence": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "tp": 401,
+              "fp": 0,
+              "fn": 0
+            }
+          },
+          "content_diagnostic_note": "Secondary diagnostic removes only exact outer Markdown JSON fences. Primary strict metrics still count those responses as failures. Defined on validation before final test."
+        }
+      }
+    }
+  },
+  "sessions": {
+    "rules": [
+      {
+        "id": "ed4d46818a874e4fab312051862765f5",
+        "started_at_utc": "2026-11-04T21:48:28.261354+00:00",
+        "status": "interrupted",
+        "completed": 31,
+        "power_start": {
+          "ac_connected": true,
+          "battery_percent": 100
+        },
+        "resources": {
+          "peak_gpu_memory_mib": 0,
+          "peak_reserved_memory_mib": 0,
+          "inference_batch_size": 1
+        },
+        "error_type": "PermissionError",
+        "last_saved_at_utc": "2026-11-04T21:48:28.385429+00:00",
+        "latency_median_s": 0.00018279999494552612,
+        "latency_p95_s": 0.0002696000155992806
+      },
+      {
+        "id": "fdd4fc27f0da43ab81958c3cc07f44e3",
+        "started_at_utc": "2026-11-04T21:49:19.801323+00:00",
+        "status": "complete",
+        "completed": 76,
+        "power_start": {
+          "ac_connected": true,
+          "battery_percent": 100
+        },
+        "resources": {
+          "peak_gpu_memory_mib": 0,
+          "peak_reserved_memory_mib": 0,
+          "inference_batch_size": 1
+        },
+        "finished_at_utc": "2026-11-04T21:49:28.514244+00:00",
+        "power_end": {
+          "ac_connected": true,
+          "battery_percent": 100
+        },
+        "latency_median_s": 0.00023204999160952866,
+        "latency_p95_s": 0.000361400016117841
+      }
+    ],
+    "original": [
+      {
+        "id": "05916463146f4f0b8b02b2a2d627c5ef",
+        "started_at_utc": "2026-11-04T21:49:28.556711+00:00",
+        "status": "complete",
+        "completed": 107,
+        "power_start": {
+          "ac_connected": true,
+          "battery_percent": 100
+        },
+        "resources": {
+          "peak_gpu_memory_mib": 1483.6015625,
+          "peak_reserved_memory_mib": 2382.0,
+          "model_revision": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+          "precision": "torch.bfloat16",
+          "inference_batch_size": 1,
+          "timing_note": "Sequential generation latency"
+        },
+        "finished_at_utc": "2026-11-04T22:05:38.197829+00:00",
+        "power_end": {
+          "ac_connected": true,
+          "battery_percent": 100
+        },
+        "latency_median_s": 8.762016300024698,
+        "latency_p95_s": 12.482247700012522
+      }
+    ],
+    "adapter": [
+      {
+        "id": "13691ae6b23746468e297462fae1230a",
+        "started_at_utc": "2026-11-04T22:05:38.279109+00:00",
+        "status": "complete",
+        "completed": 107,
+        "power_start": {
+          "ac_connected": true,
+          "battery_percent": 100
+        },
+        "resources": {
+          "peak_gpu_memory_mib": 1516.732421875,
+          "peak_reserved_memory_mib": 2422.0,
+          "model_revision": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+          "precision": "torch.bfloat16",
+          "inference_batch_size": 1,
+          "timing_note": "Sequential generation latency"
+        },
+        "finished_at_utc": "2026-11-04T22:21:53.838980+00:00",
+        "power_end": {
+          "ac_connected": true,
+          "battery_percent": 100
+        },
+        "latency_median_s": 9.216236899985233,
+        "latency_p95_s": 12.069148300011875
+      }
+    ]
+  },
+  "protocols": {
+    "rules": {
+      "version": 1,
+      "system": "rules",
+      "extension_sha256": "00b5ca6da465c4032c9c0fe96382ce80b387005477ee940ff9a65b72f46ca30c",
+      "original_dataset_sha256": "17c2c0ad5db69aba0f4ea38619ae371cd2a5450b7b2ea925039ce29638bf792b",
+      "model": "Qwen/Qwen3-1.7B",
+      "model_revision": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+      "adapter": null,
+      "adapter_weights_sha256": null,
+      "adapter_config_sha256": null,
+      "code_sha256": {
+        "modeling.py": "b653bdb233d9416444ccc51cb4c0a16b3ae459516e4085db40643b7322eba141",
+        "prompts.py": "55cf161feb4cf542b7a125a9ccd1ca56cb29d9658f4b441ca9600748da9c0707",
+        "schema.py": "a9db61f6e9a3ab3f0046edc31706836c2cf50c25fe47d310a9e333632a1c4f9a",
+        "evaluation.py": "faff304916315228f73f27f439e60d04237f1efa0925eb090e194880c3fc7008"
+      },
+      "precision": "torch.bfloat16",
+      "quantization": "nf4",
+      "double_quantization": true,
+      "max_new_tokens": 256,
+      "batch_size": 1,
+      "do_sample": false,
+      "thinking": false
+    },
+    "original": {
+      "version": 1,
+      "system": "original",
+      "extension_sha256": "00b5ca6da465c4032c9c0fe96382ce80b387005477ee940ff9a65b72f46ca30c",
+      "original_dataset_sha256": "17c2c0ad5db69aba0f4ea38619ae371cd2a5450b7b2ea925039ce29638bf792b",
+      "model": "Qwen/Qwen3-1.7B",
+      "model_revision": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+      "adapter": null,
+      "adapter_weights_sha256": null,
+      "adapter_config_sha256": null,
+      "code_sha256": {
+        "modeling.py": "b653bdb233d9416444ccc51cb4c0a16b3ae459516e4085db40643b7322eba141",
+        "prompts.py": "55cf161feb4cf542b7a125a9ccd1ca56cb29d9658f4b441ca9600748da9c0707",
+        "schema.py": "a9db61f6e9a3ab3f0046edc31706836c2cf50c25fe47d310a9e333632a1c4f9a",
+        "evaluation.py": "faff304916315228f73f27f439e60d04237f1efa0925eb090e194880c3fc7008"
+      },
+      "precision": "torch.bfloat16",
+      "quantization": "nf4",
+      "double_quantization": true,
+      "max_new_tokens": 256,
+      "batch_size": 1,
+      "do_sample": false,
+      "thinking": false
+    },
+    "adapter": {
+      "version": 1,
+      "system": "adapter",
+      "extension_sha256": "00b5ca6da465c4032c9c0fe96382ce80b387005477ee940ff9a65b72f46ca30c",
+      "original_dataset_sha256": "17c2c0ad5db69aba0f4ea38619ae371cd2a5450b7b2ea925039ce29638bf792b",
+      "model": "Qwen/Qwen3-1.7B",
+      "model_revision": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+      "adapter": "artifacts\\rank-8\\adapter",
+      "adapter_weights_sha256": "ccda629c0e603bd08b0be8b0172e0eb0f96493f04018b2644cf5aff4d0131142",
+      "adapter_config_sha256": "5c1e037b5d0130c695aaee967f93858813551b3ace6617026295b0d74ddac4b0",
+      "code_sha256": {
+        "modeling.py": "b653bdb233d9416444ccc51cb4c0a16b3ae459516e4085db40643b7322eba141",
+        "prompts.py": "55cf161feb4cf542b7a125a9ccd1ca56cb29d9658f4b441ca9600748da9c0707",
+        "schema.py": "a9db61f6e9a3ab3f0046edc31706836c2cf50c25fe47d310a9e333632a1c4f9a",
+        "evaluation.py": "faff304916315228f73f27f439e60d04237f1efa0925eb090e194880c3fc7008"
+      },
+      "precision": "torch.bfloat16",
+      "quantization": "nf4",
+      "double_quantization": true,
+      "max_new_tokens": 256,
+      "batch_size": 1,
+      "do_sample": false,
+      "thinking": false
+    }
+  },
+  "preservation": {
+    "unchanged": true,
+    "checked_files": 29,
+    "original_files_sha256": "ec9f51d418e1dbcb94f531a49be03562ff1723c87d2fd4ca3e5c13972e6aecb0"
+  }
+}

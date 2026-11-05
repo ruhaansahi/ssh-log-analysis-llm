@@ -1,0 +1,35 @@
+{
+  "original_incidents": 93,
+  "additional_incidents": 107,
+  "combined_unique_incidents": 200,
+  "source_review_completed_before_predictions": 107,
+  "independent_human_validation": false,
+  "unchanged_original_files": 29,
+  "family_overlap_with_original_partitions": 0,
+  "max_additional_combined_tokens": 768,
+  "max_additional_lines": 8,
+  "all_systems_cover_identical_additional_ids": true,
+  "scores_recomputed_from_saved_predictions": true,
+  "completed_cache_reuse_verified": true,
+  "cache_fingerprints": {
+    "rules": {
+      "predictions_sha256": "b80e55d8b22e17f57b4feb147acb41bc8e2eed39329d1c4b5f5a49fcb12455d8",
+      "session_count": 2
+    },
+    "original": {
+      "predictions_sha256": "57e338ee5fdefee02afc2759000b404906d575481f7a6fec91adef1c848c260f",
+      "session_count": 1
+    },
+    "adapter": {
+      "predictions_sha256": "841f6fad1c64b2d134b969d2e8da758f5d5afa5c6462d2dd8b12664a0719f72f",
+      "session_count": 1
+    }
+  },
+  "evaluation_run_id": "4fc13f703f6941db88cdd9626f53e453",
+  "evaluation_run_status": "FINISHED",
+  "linked_training_run_id": "aaee48926d264ffcba03ddd59d84fa19",
+  "mlflow_metric_count": 735,
+  "original_dataset_sha256": "17c2c0ad5db69aba0f4ea38619ae371cd2a5450b7b2ea925039ce29638bf792b",
+  "extension_sha256": "00b5ca6da465c4032c9c0fe96382ce80b387005477ee940ff9a65b72f46ca30c",
+  "combined_test_sha256": "1557a7a2925ee29bbf01bae668429e31e9fa94881af20aaf3f431c2f44c174bf"
+}

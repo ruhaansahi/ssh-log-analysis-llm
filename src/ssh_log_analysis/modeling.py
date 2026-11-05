@@ -230,7 +230,7 @@ def verify_saved_adapter(summary):
     return summary
 
 
-def infer_rows(model_id, rows, adapter=None, max_new_tokens=256, batch_size=1):
+def infer_rows(model_id, rows, adapter=None, max_new_tokens=256, batch_size=1, on_prediction=None):
     import torch
     model, dtype = load_model(model_id)
     tokenizer = tokenizer_for(model_id)
@@ -241,6 +241,12 @@ def infer_rows(model_id, rows, adapter=None, max_new_tokens=256, batch_size=1):
     model.eval()
     model.config.use_cache = True
     torch.cuda.reset_peak_memory_stats()
+    def resources_now():
+        return {"peak_gpu_memory_mib": torch.cuda.max_memory_allocated()/1024**2,
+                "peak_reserved_memory_mib": torch.cuda.max_memory_reserved()/1024**2,
+                "model_revision": getattr(model.config, "_commit_hash", None), "precision": str(dtype),
+                "inference_batch_size": batch_size,
+                "timing_note": "Sequential generation latency" if batch_size == 1 else "Amortized batch generation time per incident; not single-request latency"}
     predictions = []
     # Exclude a fixed synthetic warm-up from timing and from the test benchmark.
     warmup = tokenizer(prompt_text(tokenizer, smoke_rows()[0]), return_tensors="pt").to("cuda")
@@ -262,13 +268,11 @@ def infer_rows(model_id, rows, adapter=None, max_new_tokens=256, batch_size=1):
             token_count = response_ids.index(tokenizer.eos_token_id)+1 if tokenizer.eos_token_id in response_ids else len(response_ids)
             predictions.append({"id": row["id"], "raw": raw, "latency_s": elapsed/len(batch),
                                 "batch_latency_s": elapsed, "generated_tokens": token_count})
+            if on_prediction is not None:
+                on_prediction(predictions[-1], resources_now())
         if (offset + len(batch)) % 10 < batch_size or offset+len(batch) == len(rows):
             print(f"Inference: {offset+len(batch)}/{len(rows)} incidents (batch {batch_size})", flush=True)
-    resources = {"peak_gpu_memory_mib": torch.cuda.max_memory_allocated()/1024**2,
-                 "peak_reserved_memory_mib": torch.cuda.max_memory_reserved()/1024**2,
-                 "model_revision": getattr(model.config, "_commit_hash", None), "precision": str(dtype),
-                 "inference_batch_size": batch_size,
-                 "timing_note": "Sequential generation latency" if batch_size == 1 else "Amortized batch generation time per incident; not single-request latency"}
+    resources = resources_now()
     del model
     gc.collect()
     torch.cuda.empty_cache()

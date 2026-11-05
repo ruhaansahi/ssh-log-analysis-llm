@@ -14,6 +14,9 @@ def main():
     parser.add_argument("--version", action="version", version="0.1.0")
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("env-check", help="Inspect Python, packages, CUDA, and memory")
+    for command in ("prepare-test-extension", "evaluate-test-extension"):
+        extension = commands.add_parser(command, help="Prepare or evaluate an additional held-out test cohort")
+        extension.add_argument("--total", type=int, default=200)
     prepare = commands.add_parser("prepare", help="Download logs and construct deterministic partitions")
     prepare.add_argument("--source")
     prepare.add_argument("--sample", action="store_true")
@@ -38,7 +41,10 @@ def main():
     prediction.add_argument("--model", default="Qwen/Qwen3-1.7B")
     commands.add_parser("report", help="Generate the measured comparison report")
     args = parser.parse_args()
-    if args.command == "env-check":
+    if args.command in ("prepare-test-extension", "evaluate-test-extension"):
+        from .extension import prepare_extension, evaluate_extension
+        emit(prepare_extension(args.total) if args.command == "prepare-test-extension" else evaluate_extension(args.total))
+    elif args.command == "env-check":
         from .modeling import environment
         from .storage import write_json
         result = environment()

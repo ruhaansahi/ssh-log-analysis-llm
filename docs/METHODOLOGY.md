@@ -16,6 +16,22 @@ References follow the [annotation rubric](ANNOTATION_RUBRIC.md). Automated check
 
 The frozen experiment uses 1,599 training examples (1,330 source incidents and 269 identity variations), 142 validation incidents, and 93 test incidents. Combined prompt and target lengths must fit 1,024 tokens. Oversized examples are excluded consistently from every compared system, preserving complete evidence rather than silently truncating it.
 
+## Same-source test extension
+
+After the original experiment was complete, a separate extension added 107 previously unused incidents to make a combined 200-incident benchmark. The original 93-case datasets, predictions, metrics, training partitions, validation partitions, and model weights were preserved. There was no retraining or new model selection.
+
+Candidates were reconstructed from the original downloaded logs using the same hostname/process/time grouping, duplicate-family definitions, and reserved test partition. Every family selected in the original processed training, validation, or test partitions was excluded, including examples subsequently removed by token filtering. This left 540 unused reserved families; 13 exceeded the 1,024-token combined prompt/target limit, leaving 527 eligible families. Incidents also had to fit the original 32-line limit. The existing category sampler and seed 42 selected 107 cases, and source IDs were recorded before examining model predictions.
+
+All 107 selected references underwent assisted source-log inspection against the existing observable-event rubric before inference. Schema and evidence-reference checks were recorded separately from that inspection. Reviewed references could differ from parser drafts; no corrections were needed in this selection. Independent human or expert validation is not claimed. A final token-length check preceded freezing of reference and combined-test fingerprints. A deterministic reserve supplies replacements only for pre-evaluation length ineligibility, with mandatory source review of each replacement.
+
+The additional cohort has 100 failure and seven unknown outcomes, and no accepted-authentication positives. It does not increase successful-authentication coverage. Class supports are reported separately for the original, additional, and combined cohorts. Balanced selection is intended for coverage rather than estimating production event frequencies.
+
+The original model, selected rank-8 adapter, and rule parser are evaluated on identical additional IDs. Original 93-case predictions are reused rather than regenerated. Combined metrics are computed from all 200 individual records, rather than averaging cohort F1 scores. The same six-field schema, model revision, prompt, NF4/double quantization, BF16 computation, non-thinking template, deterministic decoding, 256-token response limit, and inference batch size one are retained.
+
+Each completed prediction is saved atomically to a local cache. Temporary Windows file locks receive bounded retries. Resume checks include reference, original dataset, model revision, adapter weights/configuration, prompt and scoring code, and decoding fingerprints; duplicate or out-of-order prediction IDs are rejected. A process lock prevents concurrent evaluation of the same extension. Timing, power observations, and GPU memory are reported per new execution session, including interrupted sessions; historical and new timing is not pooled into a controlled speed comparison. A separate local MLflow evaluation run links back to the selected training run.
+
+See the [separate extended report](../reports/EXTENDED_TEST_200.md) and [aggregate metrics](../reports/extended_200_metrics.json). This remains a same-source benchmark with assisted reference review. No examples or model settings are changed in response to extension predictions.
+
 ## Model adaptation
 
 The original model is Qwen3-1.7B, pinned to revision `70d244cc86ccca08cf5af4e1e306ecf908b1ad5e`. Training uses PyTorch, Transformers, Datasets, PEFT, and TRL on a 12 GB RTX 5070 Laptop GPU under native Windows and Python 3.12.
@@ -52,6 +68,10 @@ See [measured results](../reports/RESULTS.md), machine-readable metrics, and [tr
 The selected rank-8 adapter matched all six reference fields for 93/93 test incidents, with finding F1 1.000 and no invalid outputs. The result is agreement with this constrained reference policy; it does not erase the validation failures or establish performance on new sources.
 
 The original model returned Markdown fences in 76 of 93 test responses. Its strict finding F1 was 0.257; fence-only normalization raised it to 0.615. Content errors remained, including unsupported excessive-authentication-failure findings, omitted connection closures, and incorrect evidence references.
+
+On the additional 107 incidents, the selected adapter matched 105 complete records. Finding F1, canonical evidence F1, outcome accuracy, and schema validity were all 1.000, but two identity-extraction errors remained: one username was copied incorrectly, and one destination address in a `connect_to` error was incorrectly reported as the source IP instead of leaving the source absent. User and source-IP accuracy were each 106/107. Both failures were retained without changing examples, references, prompts, or weights.
+
+Combined with the original 93 cases, the adapter matched 198/200 complete records (99.0%), with finding F1 1.000 and no invalid outputs. The original model's additional-cohort strict finding F1 was 0.270, or 0.697 after outer-fence removal; its combined scores were 0.265 and 0.664, respectively. The expanded benchmark exposes field errors that finding F1 alone would hide. Successful-authentication support remains the original ten incidents.
 
 Both adapters missed one validation record involving a PAM summary. Rank 16 copied a reverse-DNS hostname into `source_ip`, violating the IP-or-null contract. Rank 8 correctly left the IP absent but omitted the available username. These cases were retained; they did not trigger a reference or prompt change.
 

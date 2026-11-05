@@ -6,7 +6,7 @@ Qwen3-1.7B is adapted with completion-only SFT and QLoRA on a 12 GB GPU, then co
 
 ## Measured results
 
-All systems use the same 93 frozen test incidents. Rank 8 was selected on validation before final testing.
+The original experiment used the same 93 frozen test incidents for every system. Rank 8 was selected on validation before final testing. The table below preserves those original results.
 
 | System | Strict finding F1 | F1 after fence removal | Exact records | Schema-valid records |
 |---|---:|---:|---:|---:|
@@ -17,6 +17,23 @@ All systems use the same 93 frozen test incidents. Rank 8 was selected on valida
 The rule parser defines the reference annotations, so its perfect agreement is expected. These results measure learning a documented extraction policy on one historical log source with shared templates. They do not establish general security-detection accuracy or cross-source generalization. The fence-only diagnostic separates formatting failures from content errors.
 
 Training used 1,599 examples, 142 validation incidents, 8.7 million trainable adapter parameters, and one 30.4-minute rank-8 run on an RTX 5070 Laptop GPU. See the [full results and resource measurements](reports/RESULTS.md) and [methodology](docs/METHODOLOGY.md).
+
+### Extended benchmark
+
+The [200-incident report](reports/EXTENDED_TEST_200.md) separates the original 93, an additional 107 previously unused incidents, and their combined scores. The extension uses the existing model weights, prompt, rubric, and inference settings. Training and validation are unchanged. This is a larger same-source benchmark with assisted reference review, not independent human validation.
+
+| Cohort | System | Strict finding F1 | F1 after fence removal | Exact records | Schema-valid records |
+|---|---|---:|---:|---:|---:|
+| Additional 107 | Original Qwen3-1.7B | 0.270 | 0.697 | 0/107 | 26/107 |
+| Additional 107 | QLoRA adapter, rank 8 | 1.000 | 1.000 | 105/107 | 107/107 |
+| Additional 107 | Rule parser | 1.000 | 1.000 | 107/107 | 107/107 |
+| Combined 200 | Original Qwen3-1.7B | 0.265 | 0.664 | 0/200 | 43/200 |
+| Combined 200 | QLoRA adapter, rank 8 | 1.000 | 1.000 | 198/200 | 200/200 |
+| Combined 200 | Rule parser | 1.000 | 1.000 | 200/200 | 200/200 |
+
+The adapter makes two identity-extraction errors in the additional cohort: one incorrect username and one destination address mistaken for a source IP. Those failures remain in the scores. Finding F1 of 1.000 therefore coexists with 198/200 exact complete records.
+
+The additional cohort contains 100 failure outcomes and seven unknown outcomes, with no new accepted-authentication positives. It broadens coverage of failures and unknown outcomes; successful-authentication coverage remains unchanged. Timing and GPU memory are reported for each new execution session, separately from the original measurements.
 
 ## Task
 
@@ -109,6 +126,18 @@ Individual commands are also available:
 .venv\Scripts\python.exe -m ssh_log_analysis report
 ```
 
+To extend the existing frozen benchmark without training again:
+
+```powershell
+.venv\Scripts\python.exe -m ssh_log_analysis prepare-test-extension --total 200
+# Inspect every draft incident against its source and complete the local audit.
+.venv\Scripts\python.exe -m ssh_log_analysis evaluate-test-extension --total 200
+```
+
+Preparation writes `draft.jsonl`, `audit.json`, a deterministic replacement reserve, and a source-selection manifest under `data/test_extensions/total-200`. It preserves an existing review queue when rerun. Each audit entry requires `review_status: rubric_review_completed`, `review_method`, and `review_notes`; source inspection and automated schema/evidence validation are recorded separately. Reviewed answers may correct the parser's draft. Do not mark entries reviewed without inspecting their source logs.
+
+Evaluation checks reviewed reference lengths and freezes their fingerprints before producing predictions. If a reviewed answer exceeds the token budget, a deterministic replacement needs its own source review before evaluation can proceed. Predictions are saved after every incident. Rerunning the command resumes only when dataset, model revision, adapter, prompt, and decoding fingerprints match; stale caches and duplicate IDs are rejected. Original predictions are reused for combined scoring. The extension report and a linked local MLflow evaluation run are separate from the original experiment.
+
 Use `--source path/to/logs.txt` to prepare a local OpenSSH file, or `--sample` for the small public sample. The sample may not support the requested counts or broad class coverage.
 
 ## Training design
@@ -132,6 +161,7 @@ The [measured comparison](reports/RESULTS.md) contains finding, field, outcome, 
 See the [methodology](docs/METHODOLOGY.md) for dataset construction, model selection, evaluation design, and error analysis.
 
 - `data/raw`: downloaded source and checksums; `data/processed`: prepared partitions; `data/filtered`: frozen experiment partitions.
+- `data/test_extensions/total-200`: reviewed extension, manifests, incremental caches, new predictions, and failure records.
 - `artifacts`: smoke verification, checkpoints, trained adapters, and training histories.
 - `reports`: metrics, selected adapter, annotation audit, predictions, failure cases, and comparison report.
 - `mlruns`: local MLflow runs, parameters, losses, and artifact references.
