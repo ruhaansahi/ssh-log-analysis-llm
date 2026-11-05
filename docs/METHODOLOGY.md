@@ -1,78 +1,133 @@
 # Methodology
 
-## Objective and task boundary
+This document explains how the experiment was built and why each decision was made. The [README](../README.md) gives the short version.
 
-Extract observable SSH authentication events into a six-field JSON record with source-line evidence. The system identifies a username, source IP, authentication outcome, supported findings, evidence IDs, and server hostname. Missing or conflicting identity values become `null`.
+## Goal
 
-The task does not establish malicious intent, stolen credentials, compromise, or hidden root causes. A disconnect alone does not establish authentication failure. An explicit acceptance takes precedence over earlier failures in the same incident.
+The goal is to turn an incident, a group of related SSH log lines that can include several authentication attempts, into a six-field JSON record: username, source IP, outcome, findings, evidence line IDs and server hostname. Missing or conflicting identity fields (`user`, `source_ip`, `server_hostname`) become `null`. The outcome is an enum and findings and evidence are nonempty lists.
 
-## Data preparation and reference annotations
+The task covers what the logs show and nothing more. A failed password is recorded as a failed password. Whether it was an attack, a typo or a stolen credential can't be told from these lines, so the model isn't asked to decide. Two rules matter a lot in practice:
 
-The source is Loghub's historical OpenSSH laboratory-server dataset. Download URLs and SHA-256 checksums are retained locally. Raw logs are excluded from Git.
+- A disconnect on its own doesn't mean authentication failed.
+- If a login is accepted, the outcome is `success`, even if earlier attempts in the same incident failed.
 
-Events are grouped by server hostname, SSH process ID, and time continuity. Disconnect messages terminate a group. Duplicate-family keys preserve identities and event text while normalizing port numbers. Families are assigned to deterministic partitions before balanced sampling. Training-only username, IP, and hostname substitutions preserve the parent partition and are rejected when they alter finding or outcome semantics.
+## Data
 
-References follow the [annotation rubric](ANNOTATION_RUBRIC.md). Automated checks validate the schema, supported events, outcome precedence, and evidence references. All 100 selected test incidents underwent assisted source-log review before training; 93 remained after length filtering. This is not independent expert validation. The audit corrected an IPv4 delimiter extraction bug and a generic PAM failure-outcome bug before model scoring.
+The source is the [Loghub OpenSSH dataset](https://github.com/logpai/loghub/tree/master/OpenSSH), a set of real logs from a lab server. The download step stores the source URL and a SHA-256 checksum. The raw logs aren't committed to Git.
 
-The frozen experiment uses 1,599 training examples (1,330 source incidents and 269 identity variations), 142 validation incidents, and 93 test incidents. Combined prompt and target lengths must fit 1,024 tokens. Oversized examples are excluded consistently from every compared system, preserving complete evidence rather than silently truncating it.
+Log lines are grouped into incidents by server hostname and SSH process ID. Explicit SSH disconnect messages end an incident. An idle gap longer than 30 minutes or a backwards timestamp also starts a new group. This produced 157,611 candidate incidents; groups longer than 32 lines were excluded before sampling. These boundaries are an approximation of connections.
 
-## Same-source test extension
+## Labels and review
 
-After the original experiment was complete, a separate extension added 107 previously unused incidents to make a combined 200-incident benchmark. The original 93-case datasets, predictions, metrics, training partitions, validation partitions, and model weights were preserved. There was no retraining or new model selection.
+Reference answers come from a rule-based parser that follows the [labeling rubric](ANNOTATION_RUBRIC.md). Automated checks confirm that every answer matches the schema, that each finding is supported by a line in the incident, that the outcome follows the precedence rules, and that every cited line exists.
 
-Candidates were reconstructed from the original downloaded logs using the same hostname/process/time grouping, duplicate-family definitions, and reserved test partition. Every family selected in the original processed training, validation, or test partitions was excluded, including examples subsequently removed by token filtering. This left 540 unused reserved families; 13 exceeded the 1,024-token combined prompt/target limit, leaving 527 eligible families. Incidents also had to fit the original 32-line limit. The existing category sampler and seed 42 selected 107 cases, and source IDs were recorded before examining model predictions.
+Before training, all 100 selected test incidents were checked against their original log lines, using tool-assisted review alongside the automated checks. This was not an independent expert review. It found two parser bugs, both fixed before any model was scored:
 
-All 107 selected references underwent assisted source-log inspection against the existing observable-event rubric before inference. Schema and evidence-reference checks were recorded separately from that inspection. Reviewed references could differ from parser drafts; no corrections were needed in this selection. Independent human or expert validation is not claimed. A final token-length check preceded freezing of reference and combined-test fingerprints. A deterministic reserve supplies replacements only for pre-evaluation length ineligibility, with mandatory source review of each replacement.
+1. An IPv4 address directly followed by a colon was not being extracted.
+2. A generic PAM authentication failure was leaving the outcome as `unknown` when it should have been `failure`.
 
-The additional cohort has 100 failure and seven unknown outcomes, and no accepted-authentication positives. It does not increase successful-authentication coverage. Class supports are reported separately for the original, additional, and combined cohorts. Balanced selection is intended for coverage rather than estimating production event frequencies.
+## Splits
 
-The original model, selected rank-8 adapter, and rule parser are evaluated on identical additional IDs. Original 93-case predictions are reused rather than regenerated. Combined metrics are computed from all 200 individual records, rather than averaging cohort F1 scores. The same six-field schema, model revision, prompt, NF4/double quantization, BF16 computation, non-thinking template, deterministic decoding, 256-token response limit, and inference batch size one are retained.
+Many incidents are near-copies of each other, because bots repeat the same attempt. A "family" matches the server hostname and ordered messages after normalizing port numbers. This comparison ignores timestamps and process IDs but retains usernames and IP addresses. One original representative per family is retained, leaving 5,729 families, and a fixed hash assigns each family to train, validation or test. A check confirms that no family appears in more than one split.
 
-Each completed prediction is saved atomically to a local cache. Temporary Windows file locks receive bounded retries. Resume checks include reference, original dataset, model revision, adapter weights/configuration, prompt and scoring code, and decoding fingerprints; duplicate or out-of-order prediction IDs are rejected. A process lock prevents concurrent evaluation of the same extension. Timing, power observations, and GPU memory are reported per new execution session, including interrupted sessions; historical and new timing is not pooled into a controlled speed comparison. A separate local MLflow evaluation run links back to the selected training run.
+After that, each split is sampled so that each type of event is represented, since successful logins are rare compared with failures. This means the class mix doesn't match what a real server would see.
 
-See the [separate extended report](../reports/EXTENDED_TEST_200.md) and [aggregate metrics](../reports/extended_200_metrics.json). This remains a same-source benchmark with assisted reference review. No examples or model settings are changed in response to extension predictions.
+For training only, a fifth of the training incidents were copied with made-up usernames, IP addresses and hostnames swapped in. A copy was thrown away if the swap changed its findings or outcome. Each copy stays in the same split as the incident it came from. After the length filter described below, 269 of these copies remained.
 
-## Model adaptation
+Prompt and answer together had to fit in 1,024 tokens. Longer incidents were removed from every system's test set. They were never cut short, because cutting them could remove the very lines that prove a finding. The final splits were:
 
-The original model is Qwen3-1.7B, pinned to revision `70d244cc86ccca08cf5af4e1e306ecf908b1ad5e`. Training uses PyTorch, Transformers, Datasets, PEFT, and TRL on a 12 GB RTX 5070 Laptop GPU under native Windows and Python 3.12.
+| Split | Incidents |
+|---|---:|
+| Training | 1,599 (1,330 real, 269 with swapped names) |
+| Validation | 142 |
+| Test | 93 |
 
-Completion-only SFT computes next-token cross-entropy on the JSON response and response-ending token. Prompt tokens are excluded from the loss. QLoRA keeps the original model frozen with NF4 weights and double quantization while optimizing low-rank adapters on attention and MLP projections. Computation uses BF16 on the verified GPU.
+## Training
 
-Both candidates use one epoch, learning rate `2e-4`, microbatch 1, gradient accumulation 8, maximum combined sequence length 1,024, gradient checkpointing, and seed 42. One epoch yields 200 optimizer updates. The five-step smoke test separately verifies finite optimization, frozen base-parameter flags, changing adapter weights, and successful save/reload. It is not a performance benchmark.
+The base model is Qwen3-1.7B, pinned to revision `70d244cc86ccca08cf5af4e1e306ecf908b1ad5e`. Training used PyTorch, Transformers, Datasets, PEFT and TRL on a 12 GB RTX 5070 Laptop GPU, on Windows with Python 3.12.
 
-| Candidate | Trainable parameters | Percent trainable | Training minutes | Validation exact records | Validation finding F1 |
+The method is QLoRA:
+
+- The base model is loaded in 4-bit NF4 with double quantization and kept frozen.
+- LoRA adapters are added to every attention projection (q, k, v, o) and MLP projection (gate, up, down). Only the adapters are trained.
+- The loss is cross-entropy on the JSON answer and the end-of-answer token only. The prompt tokens don't count towards the loss.
+- Computation runs in BF16.
+
+Both runs used one epoch, a learning rate of 2e-4 with a cosine schedule and 5% warm-up, a micro-batch of 1 with 8 gradient accumulation steps, gradient checkpointing, a maximum length of 1,024 tokens and seed 42. One epoch is 200 optimizer steps.
+
+Before the real runs, a five-step smoke test checks that the loss stays finite, that the base weights are frozen, that the adapter weights actually change, and that the saved adapter loads again and produces output. It isn't a benchmark.
+
+## Choosing between runs
+
+Two adapter sizes were trained:
+
+| Rank | Trainable parameters | Share of model | Training time | Validation records fully correct | Validation finding F1 |
 |---|---:|---:|---:|---:|---:|
-| Rank 16 | 17,432,576 | 1.00% | 28.59 | 141/142 | 0.998 |
-| Rank 8 | 8,716,288 | 0.50% | 30.40 | 141/142 | 1.000 |
+| 16 | 17,432,576 | 1.00% | 28.59 min | 141 / 142 | 0.998 |
+| 8 | 8,716,288 | 0.50% | 30.40 min | 141 / 142 | 1.000 |
 
-Rank 8 was selected using validation exact-record accuracy, followed by finding F1, schema validity, and validation loss. Rank 16 had lower token-level validation loss but lost the finding-F1 tie-break. The smaller adapter was not faster to train in these single runs; device conditions and runtime variability were not tightly controlled enough to attribute that timing difference to rank alone.
+The choice was made on validation results only, in this order: fully correct records, then finding F1, then valid-format rate, then validation loss. Both runs tied on the first, so rank 8 won on finding F1. Rank 16 had the lower validation loss, which shows that the lowest loss doesn't always give the best task score.
 
-## Evaluation protocol
+Rank 8 was not faster to train, despite being smaller. These were single runs on a laptop, so the timing difference can't be pinned on rank alone.
 
-The rule parser, original model, and selected adapter are scored on identical frozen test incidents. The rule parser also generates the reference labels, so its perfect agreement is circular and expected. It establishes consistency with the annotation policy, not perfect real-world detection.
+## Evaluation
 
-Original and adapted inference use identical prompts, quantization, non-thinking chat templates, deterministic decoding, and a 256-token response limit. Reference answers are not included in model inputs. Validation inference uses batches of four; final test inference uses batch size one. Validation timing is amortized batch time, not single-request latency.
+The rule parser, the base model and the fine-tuned model are all scored on the same frozen test incidents. Because the parser also wrote the reference answers, its perfect score is expected. It shows that the labels are consistent with the rules, not that the rules are perfect.
 
-Primary metrics include finding precision/recall/F1, field and outcome accuracy, exact-record accuracy, evidence precision/recall, invalid-output rate, unsupported-finding rate, generation latency, and GPU memory. Malformed or schema-invalid predictions fail the incident. Missing predictions also fail. Duplicate prediction IDs are rejected. Exact records compare finding and evidence lists without requiring their order to match.
+Both models use the same prompt, the same 4-bit quantization, Qwen's non-thinking chat template, greedy decoding and a 256-token answer limit. The reference answer is never part of the input. Validation inference ran in batches of four, so its timing is an average per incident. Final test inference used a batch size of one, so timing measures sequential model generation per incident, not end-to-end service latency. Greedy decoding disables random sampling but does not guarantee bit-for-bit repeatability across platforms or library versions; see [PyTorch's reproducibility notes](https://docs.pytorch.org/docs/2.8/notes/randomness.html).
 
-A secondary diagnostic removes only exact outer Markdown JSON fences. It does not repair JSON or extract objects from prose. This diagnostic was defined using validation before final testing and separates formatting compliance from content extraction. The primary score continues to reject fenced responses.
+What gets measured:
 
-Canonical evidence metrics require reference line IDs. Another supporting line can be substantively valid while losing canonical-match credit, so supported-citation rate is also recorded. Unsupported-finding rate counts schema-valid responses containing extra findings; invalid responses are reported separately.
+- Precision, recall and F1 for findings, overall and for each finding type
+- Accuracy for each field
+- Exact-record accuracy, where all six fields must be right
+- Evidence precision and recall against the reference line IDs
+- Invalid-output rate and unsupported-finding rate
+- Generation latency and GPU memory
 
-During final evaluation, the laptop changed from battery to AC power. Full-test timing is observational. A paired AC-power comparison uses the last 20 frozen test incidents for both models; this window was fixed before those original-model timings were collected. Timing excludes model loading and a fixed synthetic warm-up. PyTorch allocated and reserved memory are reported separately.
+Malformed output, output that breaks the schema and missing predictions all count as failures. Duplicate prediction IDs are rejected. The order of findings and evidence lines doesn't matter.
 
-See [measured results](../reports/RESULTS.md), machine-readable metrics, and [training histories](../reports/training_histories.json). Parameters, dataset versions, losses, validation results, resource use, and report artifacts are retained in local MLflow.
+There is also a secondary score that strips Markdown code fences from around an answer and nothing else. It doesn't repair broken JSON or dig answers out of surrounding text. It was defined on validation data before the final test, so that formatting problems and content problems can be told apart. The main score still counts fenced answers as wrong.
+
+Evidence is matched against the reference line IDs. A model could cite a different line that also supports a finding and lose credit for it, so an additional supported-citation rate is recorded using the parser's event rules. That metric is an automated rule check, not an independent judgment that a citation supports every field or the outcome.
+
+The laptop switched from battery to mains power partway through the full test, which affects timing. To get a fair speed comparison, the last 20 test incidents were picked in advance, after the switch, and both models were timed on them at batch size one. Model loading and a short warm-up are excluded from timing. PyTorch's allocated and reserved GPU memory are reported separately.
+
+Training parameters, dataset fingerprints, logged losses, validation results, resource summaries and the original and extended comparison reports are recorded in a local MLflow store. Individual CLI commands are not all separate tracked runs.
+
+## The 200-incident extension
+
+After the original experiment was finished, 107 more test incidents were added to make 200. Nothing was retrained or reselected, and the original data, predictions and model files were left untouched. A check confirms they still match their saved hashes.
+
+The new incidents came from the same reserved test families, using the same grouping and family rules. Every family already used in training, validation or the original test set was excluded, including ones later removed for length. That left 540 unused families. 13 were over the token limit, leaving 527. The original sampler and seed then picked 107, and their IDs were recorded before any model saw them.
+
+All 107 were checked against their source log lines before inference. None needed correcting. The new incidents contain 100 failures and 7 unknown outcomes, and no successful logins, so the test still has only 10 successful-login cases in total.
+
+The base model, the rank-8 adapter and the parser were run on the same 107 incidents with identical settings. The original 93 predictions were reused. Combined scores are calculated from all 200 individual records, not by averaging the two groups. Predictions are saved after every incident, and a resumed run only continues if the data, model, adapter, prompt and decoding settings all match.
+
+See the [200-incident report](../reports/EXTENDED_TEST_200.md) for the full tables.
 
 ## Error analysis and limits
 
-The selected rank-8 adapter matched all six reference fields for 93/93 test incidents, with finding F1 1.000 and no invalid outputs. The result is agreement with this constrained reference policy; it does not erase the validation failures or establish performance on new sources.
+On the original 93 test incidents, the fine-tuned model got all six fields right every time, with finding F1 of 1.000 and no invalid output.
 
-The original model returned Markdown fences in 76 of 93 test responses. Its strict finding F1 was 0.257; fence-only normalization raised it to 0.615. Content errors remained, including unsupported excessive-authentication-failure findings, omitted connection closures, and incorrect evidence references.
+The base model wrapped 76 of its 93 answers in Markdown code fences. Its strict finding F1 was 0.257, rising to 0.615 once only the fences were removed. Its remaining errors were real content mistakes: reporting "too many authentication failures" when the log didn't say so, missing disconnects, and citing the wrong lines.
 
-On the additional 107 incidents, the selected adapter matched 105 complete records. Finding F1, canonical evidence F1, outcome accuracy, and schema validity were all 1.000, but two identity-extraction errors remained: one username was copied incorrectly, and one destination address in a `connect_to` error was incorrectly reported as the source IP instead of leaving the source absent. User and source-IP accuracy were each 106/107. Both failures were retained without changing examples, references, prompts, or weights.
+On the 107 new incidents, the fine-tuned model got 105 records fully right. Finding F1, evidence F1, outcome accuracy and format validity were all perfect, but two fields were wrong:
 
-Combined with the original 93 cases, the adapter matched 198/200 complete records (99.0%), with finding F1 1.000 and no invalid outputs. The original model's additional-cohort strict finding F1 was 0.270, or 0.697 after outer-fence removal; its combined scores were 0.265 and 0.664, respectively. The expanded benchmark exposes field errors that finding F1 alone would hide. Successful-authentication support remains the original ten incidents.
+- One username was copied incorrectly.
+- In one incident, a destination address from a `connect_to` error was reported as the source IP, when the source should have been left empty.
 
-Both adapters missed one validation record involving a PAM summary. Rank 16 copied a reverse-DNS hostname into `source_ip`, violating the IP-or-null contract. Rank 8 correctly left the IP absent but omitted the available username. These cases were retained; they did not trigger a reference or prompt change.
+Across all 200 incidents, that gives 198 fully correct records (99%), finding F1 of 1.000 and no invalid output. The base model scored 0.265 strict F1 overall, or 0.664 with fences removed. These two errors are a good example of why exact-record accuracy matters: finding F1 alone would have shown a perfect score.
 
-This benchmark has one historical source, one server hostname, shared event templates, some shared identities, and small class supports. Zero duplicate-family overlap does not establish unseen-template, unseen-user, unseen-IP, or cross-host generalization. Balanced sampling differs from production event prevalence. Independent annotations and a separate log source would be needed to support broader detection claims. For fixed log formats, the deterministic parser remains a practical alternative to an LLM.
+On validation, both adapters missed the same record, which involved a PAM summary line. Rank 16 put a reverse-DNS hostname into `source_ip`, which breaks the rule that it must be an IP address or `null`. Rank 8 left the IP empty correctly but missed the username. Neither case led to any change in references or prompts.
+
+The main limit is that everything comes from one historical server with one hostname. Log templates, and some usernames and IP addresses, appear in more than one split. Keeping the defined families separate prevents overlap under that specific matching rule, but does not rule out other semantic similarities or make this a test on new templates, new users or new servers. The sampling is also balanced rather than true to real-world frequencies.
+
+The next steps follow from that:
+
+1. Test on logs from other sources and newer OpenSSH message formats, with answers labeled independently of the parser.
+2. Add a few-shot prompting baseline to see how much of the gain needs fine-tuning at all.
+3. Compare model size, learning rate and training-set size on that harder test set.
+
+For a single fixed log format, the rule parser remains a practical choice. The value of a fine-tuned model would come from handling formats a parser wasn't written for.

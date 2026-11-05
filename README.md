@@ -1,43 +1,28 @@
-# SSH Log Fine-Tuning
+# Fine-Tuning an LLM to Read SSH Login Logs
 
-A reproducible fine-tuning experiment that turns SSH authentication logs into structured summaries with exact evidence lines. It extracts who attempted to connect, the source IP, the authentication outcome, and the events supported by the logs.
+SSH servers can record authentication attempts, accepted logins, failures and disconnects. These messages are interleaved across connections, which makes a busy log difficult to read by hand.
 
-Qwen3-1.7B is adapted with completion-only SFT and QLoRA on a 12 GB GPU, then compared with the original model and a deterministic parser. The experiment records dataset provenance, partition boundaries, evidence quality, and GPU costs. Rule-generated references are not independent expert ground truth.
+In this project I fine-tuned a small open-weight language model, [Qwen3-1.7B](https://huggingface.co/Qwen/Qwen3-1.7B), to read a related group of SSH log lines, called an incident, and write a short, structured summary of it: who tried to log in, where they connected from, whether they got in, what happened along the way, and which log lines prove each of those points.
 
-## Measured results
+The adapters were trained on a single 12 GB laptop GPU, then tested against the pretrained model without the task adapter and a rule-based parser. "Base model" below means that pretrained Qwen model, not a model trained from scratch.
 
-The original experiment used the same 93 frozen test incidents for every system. Rank 8 was selected on validation before final testing. The table below preserves those original results.
+## Results at a glance
 
-| System | Strict finding F1 | F1 after fence removal | Exact records | Schema-valid records |
-|---|---:|---:|---:|---:|
-| Original Qwen3-1.7B | 0.257 | 0.615 | 0/93 | 17/93 |
-| QLoRA adapter, rank 8 | 1.000 | 1.000 | 93/93 | 93/93 |
-| Rule parser | 1.000 | 1.000 | 93/93 | 93/93 |
+These results use 200 held-out incidents from the same log source, excluded from training and adapter selection. The original 93 were tested first; 107 were added after that experiment was complete. Correctness here means agreement with the reviewed, rule-derived reference answers:
 
-The rule parser defines the reference annotations, so its perfect agreement is expected. These results measure learning a documented extraction policy on one historical log source with shared templates. They do not establish general security-detection accuracy or cross-source generalization. The fence-only diagnostic separates formatting failures from content errors.
+| | Base Qwen3-1.7B | Fine-tuned Qwen3-1.7B |
+|---|---:|---:|
+| Records with every field correct | 0 / 200 | 198 / 200 |
+| Finding F1 (0 to 1, higher is better) | 0.265 | 1.000 |
+| Answers in the required JSON format | 43 / 200 | 200 / 200 |
 
-Training used 1,599 examples, 142 validation incidents, 8.7 million trainable adapter parameters, and one 30.4-minute rank-8 run on an RTX 5070 Laptop GPU. See the [full results and resource measurements](reports/RESULTS.md) and [methodology](docs/METHODOLOGY.md).
+Training took about 30 minutes and updated 8.7 million parameters, around 0.5% of the model.
 
-### Extended benchmark
+More detail is in the [full results](reports/RESULTS.md), the [200-incident test report](reports/EXTENDED_TEST_200.md) and the [methodology notes](docs/METHODOLOGY.md).
 
-The [200-incident report](reports/EXTENDED_TEST_200.md) separates the original 93, an additional 107 previously unused incidents, and their combined scores. The extension uses the existing model weights, prompt, rubric, and inference settings. Training and validation are unchanged. This is a larger same-source benchmark with assisted reference review, not independent human validation.
+## What the model does
 
-| Cohort | System | Strict finding F1 | F1 after fence removal | Exact records | Schema-valid records |
-|---|---|---:|---:|---:|---:|
-| Additional 107 | Original Qwen3-1.7B | 0.270 | 0.697 | 0/107 | 26/107 |
-| Additional 107 | QLoRA adapter, rank 8 | 1.000 | 1.000 | 105/107 | 107/107 |
-| Additional 107 | Rule parser | 1.000 | 1.000 | 107/107 | 107/107 |
-| Combined 200 | Original Qwen3-1.7B | 0.265 | 0.664 | 0/200 | 43/200 |
-| Combined 200 | QLoRA adapter, rank 8 | 1.000 | 1.000 | 198/200 | 200/200 |
-| Combined 200 | Rule parser | 1.000 | 1.000 | 200/200 | 200/200 |
-
-The adapter makes two identity-extraction errors in the additional cohort: one incorrect username and one destination address mistaken for a source IP. Those failures remain in the scores. Finding F1 of 1.000 therefore coexists with 198/200 exact complete records.
-
-The additional cohort contains 100 failure outcomes and seven unknown outcomes, with no new accepted-authentication positives. It broadens coverage of failures and unknown outcomes; successful-authentication coverage remains unchanged. Timing and GPU memory are reported for each new execution session, separately from the original measurements.
-
-## Task
-
-Example input from the fictional [demo incident](examples/incident.txt):
+Here is a short, made-up incident ([examples/incident.txt](examples/incident.txt)):
 
 ```text
 Nov 04 12:00:00 gateway sshd[101]: Invalid user backup-agent from 192.0.2.10
@@ -45,7 +30,7 @@ Nov 04 12:00:02 gateway sshd[101]: Failed password for invalid user backup-agent
 Nov 04 12:00:03 gateway sshd[101]: Connection closed by 192.0.2.10 [preauth]
 ```
 
-The required output contains exactly these six fields. Evidence IDs refer to lines in the supplied incident:
+Each line is tagged L1, L2, L3 before it goes to the model, and the model returns this:
 
 ```json
 {
@@ -58,130 +43,238 @@ The required output contains exactly these six fields. Evidence IDs refer to lin
 }
 ```
 
-This is extraction of observable events, not proof of an attack or a hidden root cause. A disconnect alone does not establish authentication failure. An accepted authentication overrides earlier failures in the same incident. Missing or conflicting identities become `null`.
+| Field | Meaning |
+|---|---|
+| `user` | The account name someone tried to log in as |
+| `source_ip` | The IP address the attempt came from |
+| `connection_outcome` | `success`, `failure` or `unknown` |
+| `findings` | Which events happened, from a fixed list of six |
+| `evidence_line_ids` | The log lines that support those findings |
+| `server_hostname` | The server that wrote the log |
 
-The [saved GPU demo prediction](reports/demo_prediction.json) includes the actual generated response, schema validation, latency, and memory measurements for this example.
+The six possible findings are `invalid_user`, `password_authentication_failed`, `authentication_accepted`, `too_many_authentication_failures`, `connection_closed` and `insufficient_evidence`.
+
+The labeling rules set `user`, `source_ip` and `server_hostname` to `null` when the incident lacks a supported value or contains conflicting values. Outcomes use `success`, `failure` or `unknown`; findings and evidence are lists. The task describes observable events rather than intent. Model outputs can still be wrong, so the cited lines need checking.
+
+The real output for this example, with timing and memory use, is saved in [reports/demo_prediction.json](reports/demo_prediction.json).
+
+## How it works, step by step
 
 ```mermaid
 flowchart TD
-    A[Public SSH logs] --> B[Incidents and rubric annotations]
-    B --> C[Family-aware partitions]
-    C --> D[Training and identity variations]
-    C --> E[Validation]
-    C --> F[Frozen test]
-    D --> G[QLoRA adapters]
-    G --> H[Validation-based selection]
-    E --> H
-    H --> I[Original vs adapter vs rules]
-    F --> I
+    A[Public SSH logs] --> B[Group lines into incidents]
+    B --> C[Label each incident]
+    C --> D[Split into train, validation and test]
+    D --> E[Fine-tune with QLoRA]
+    E --> F[Pick the best run on validation data]
+    F --> G[Test against base model and rule parser]
 ```
 
-## Setup
+### 1. Get the data
 
-Training requires Python 3.12, an NVIDIA CUDA GPU, and [uv](https://docs.astral.sh/uv/). The locked environment uses PyTorch 2.8.0 with CUDA 12.8 and the versioned Hugging Face training stack.
+The logs come from the [Loghub OpenSSH dataset](https://github.com/logpai/loghub/tree/master/OpenSSH), a public collection of real logs from a lab server, published for research. The download script records a SHA-256 checksum of the file so anyone rerunning the project can confirm they have the same data. The raw logs are not stored in this repository.
 
-```powershell
+### 2. Group the lines into incidents
+
+A server log mixes many connections together, line by line. Lines are grouped by server name and SSH process ID. Explicit SSH disconnect messages end a group; an idle gap longer than 30 minutes or a timestamp moving backwards starts a new one. This produced 157,611 candidate incidents. Groups longer than 32 lines were excluded before sampling. Grouping is approximate, and an incident can contain several authentication attempts.
+
+### 3. Label each incident
+
+Each incident needs a correct answer to train and test against. A rule-based parser ([schema.py](src/ssh_log_analysis/schema.py)) produces these answers, following a short written [labeling rubric](docs/ANNOTATION_RUBRIC.md).
+
+Before any training, all 100 selected test answers were checked against their original log lines through tool-assisted source review and automated checks, not independent expert review. This caught two bugs in the parser: IPv4 addresses followed by a colon were being missed, and PAM authentication failures were being marked as `unknown`. Both were fixed before any model was scored.
+
+### 4. Keep duplicate families in one split
+
+Bots often send the same attempt over and over. If one copy ends up in the training set and a near-identical copy ends up in the test set, the test score looks better than it should. To reduce this risk, a "family" matches the server hostname and ordered messages after port numbers are normalized. Timestamps and process IDs are ignored by this comparison; usernames and IP addresses are retained. One original incident per family is kept, leaving 5,729 families, and a fixed hash assigns each to one split. Each split was also balanced so that rarer events, like successful logins, show up often enough to learn from and measure.
+
+For training only, extra examples were created by swapping in made-up usernames, IP addresses and hostnames. After length filtering, 269 of these copies remained. They provide practice copying values outside the original identities.
+
+After removing incidents longer than 1,024 tokens, the final splits were:
+
+| Split | Incidents |
+|---|---:|
+| Training | 1,599 (1,330 real, 269 with swapped names) |
+| Validation | 142 |
+| Test | 93, later extended to 200 |
+
+### 5. Fine-tune with QLoRA
+
+Updating all the weights and optimizer states would use much more memory than adapter training. QLoRA reduces the memory needed in two ways:
+
+- The original model is loaded in 4-bit precision (NF4) and frozen, so its weights never change and take up much less memory.
+- Small trainable matrices, called LoRA adapters, are attached to the model's attention and feed-forward layers. Only these adapters are trained.
+
+Other training choices:
+
+- **Loss on the answer only.** The model is graded only on the JSON it writes, not on repeating the prompt (completion-only fine-tuning).
+- **Memory savers.** BF16 mixed precision, gradient checkpointing, and gradient accumulation to reach an effective batch size of 8 while processing one example at a time.
+- **Settings.** Learning rate 2e-4, one pass over the training data (200 optimizer steps), fixed random seed 42.
+- **Same prompt everywhere.** Training, the base-model baseline and the fine-tuned model all use one shared prompt ([prompts.py](src/ssh_log_analysis/prompts.py)).
+
+![Training loss](reports/training_loss.png)
+
+### 6. Pick the best run on validation data
+
+I trained two adapter sizes, rank 8 and rank 16 (rank controls how many parameters the adapter has). They were compared on the validation set only. Test predictions were not used to choose between them.
+
+| Rank | Trainable parameters | Training time | Validation records fully correct | Validation finding F1 |
+|---|---:|---:|---:|---:|
+| 16 | 17.4 M | 28.6 min | 141 / 142 | 0.998 |
+| 8 | 8.7 M | 30.4 min | 141 / 142 | 1.000 |
+
+Rank 8 was selected. Rank 16 had a lower validation loss, but rank 8 matched it on fully correct records and scored slightly higher on finding F1, with half the parameters.
+
+### 7. Test it
+
+Three systems were run on the same test incidents:
+
+1. The base Qwen3-1.7B
+2. The fine-tuned model (rank 8)
+3. The rule-based parser
+
+Both models got the same prompt and used greedy decoding without random token sampling. The model revision and settings are pinned, but bit-for-bit repeatability across hardware or software versions is not guaranteed. Any answer that wasn't valid JSON with exactly the six fields counted as wrong.
+
+The main measurements:
+
+- **Exact record:** all six fields are correct.
+- **Finding F1:** how closely the list of events matches, penalizing both missed and extra events.
+- **Evidence precision and recall:** whether the cited lines are the right ones.
+- **Speed and GPU memory** for each system.
+
+Training runs and the original and extended evaluation summaries are recorded in the local MLflow store.
+
+## Results
+
+The original test set had 93 incidents. I later added 107 more unused incidents from the same reserved test pool, without retraining anything, to make 200. The additional cohort contains 100 failure outcomes and seven unknown outcomes, with no successful logins. Successful-login coverage still rests on the original ten cases.
+
+| Test set | System | Finding F1 | F1 with code fences removed | Records fully correct | Valid JSON format |
+|---|---|---:|---:|---:|---:|
+| Original 93 | Base model | 0.257 | 0.615 | 0 / 93 | 17 / 93 |
+| Original 93 | Fine-tuned | 1.000 | 1.000 | 93 / 93 | 93 / 93 |
+| All 200 | Base model | 0.265 | 0.664 | 0 / 200 | 43 / 200 |
+| All 200 | Fine-tuned | 1.000 | 1.000 | 198 / 200 | 200 / 200 |
+
+What stood out:
+
+- **Formatting caused many strict-scoring failures for the base model.** It wrapped 157 of its 200 answers in Markdown code fences, which breaks strict JSON parsing. Stripping just those fences raises its F1 from 0.26 to 0.66. Content errors remained after that formatting change: extra events that weren't in the log, missed disconnects and wrong line numbers.
+- **The fine-tuned model matched the reference findings on all 200 incidents, but two records still had a wrong identity field.** In one, a username was copied incorrectly. In the other, a destination address was reported as the source IP. F1 alone would have hidden these, which is why exact-record accuracy is tracked too. Both errors are kept in the scores.
+- **Latency depended on the evaluation session.** On the matched 20-incident comparison, average answer length fell from 94 to 55.4 tokens and median time fell from 8.8 to 7.2 seconds. On the additional 107 incidents, the adapter was slower: median 9.2162 seconds versus 8.7620 for the base model. These runs do not establish a general speed advantage.
+- **The rule parser scores 100% because it wrote the reference answers.** It's included as a reference point, and as a reminder that for a single fixed log format, a parser is far faster and cheaper than an LLM.
+
+## Limits and next steps
+
+All the data comes from one lab server. Log formats and some usernames and IP addresses occur across splits. Zero incident-ID and family overlap does not establish complete freedom from leakage or unseen-template generalization. The results show the model learned this labeling scheme very well. They don't yet show how it handles other servers or other log formats.
+
+Next steps:
+
+1. Build a harder test set from other sources and newer OpenSSH message formats, including cases the rule parser can't handle.
+2. Add a few-shot prompting baseline to measure how much of the improvement needed fine-tuning.
+3. Compare more training runs on that harder set: model size, learning rate and training-set size.
+
+## Running it yourself
+
+Use Python 3.12 and [uv](https://docs.astral.sh/uv/). Training and model inference require an NVIDIA CUDA GPU; the measured setup was Windows 11 with a 12 GB RTX 5070 Laptop GPU and PyTorch 2.8.0 / CUDA 12.8. The commands use `uv run` instead of Windows-specific executable paths, but the full locked GPU environment has only been validated on Windows. Linux needs compatible NVIDIA drivers and packages. This CUDA pipeline does not support macOS GPU training or inference. The rule parser and unit tests do not need a GPU.
+
+### Setup
+
+Run these commands from the repository root. Creating `.cache` first is needed by the test suite's configured temporary directory on a fresh clone.
+
+```bash
 uv sync --locked --python 3.12
-.venv\Scripts\python.exe -m ssh_log_analysis env-check
-.venv\Scripts\python.exe -m pytest -q
+uv run python -c "from pathlib import Path; Path('.cache').mkdir(exist_ok=True)"
+uv run python -m ssh_log_analysis env-check   # checks Python, packages and the GPU
+uv run pytest -q                              # 48 tests, no GPU needed
 ```
 
-Open this folder in VS Code and select `.venv\Scripts\python.exe` as the Python interpreter. Windows symlink warnings from the model cache do not prevent operation; additional disk space may be used.
+### Rerun the experiment
 
-## Reproduce the experiment
+```bash
+# 1. Download the logs, group them into incidents and build the splits
+uv run python -m ssh_log_analysis prepare
+uv run python -m ssh_log_analysis validate
 
-```powershell
-# Download the full public source and prepare disjoint incident partitions.
-.venv\Scripts\python.exe -m ssh_log_analysis prepare
-.venv\Scripts\python.exe -m ssh_log_analysis validate
+# 2. Export the test answers for review (see the note below)
+uv run python -m ssh_log_analysis audit
 
-# Export a review queue. Review source logs, labels, and evidence before scoring.
-.venv\Scripts\python.exe -m ssh_log_analysis audit
+# 3. Quick five-step training check: confirms the adapters update and the original weights stay frozen
+uv run python -m ssh_log_analysis smoke
 
-# Verify five real optimizer steps, frozen original weights, and adapter changes.
-.venv\Scripts\python.exe -m ssh_log_analysis smoke
+# 4. Remove incidents over 1,024 tokens and freeze the splits
+uv run python -m ssh_log_analysis filter-data
 
-# Freeze identical length-filtered partitions for all compared systems.
-.venv\Scripts\python.exe -m ssh_log_analysis filter-data
+# 5. Run everything: baselines, both training runs, selection and final test
+uv run python -m ssh_log_analysis run-experiment
 
-# After audit review, run baselines, training, validation selection, and final test.
-.venv\Scripts\python.exe -m ssh_log_analysis run-experiment
+# 6. Try the rank-8 adapter used in the reported experiment
+uv run python -m ssh_log_analysis predict --file examples/incident.txt --adapter artifacts/rank-8/adapter
 
-# Inspect predictions on a fictional example, using the selected adapter path.
-$selectedAdapter = (Get-Content reports/selection.json | ConvertFrom-Json).adapter
-.venv\Scripts\python.exe -m ssh_log_analysis predict --file examples/incident.txt --adapter $selectedAdapter
-
-# Inspect local experiment tracking. This starts a local UI when requested.
-.venv\Scripts\mlflow.exe ui --backend-store-uri ./mlruns --host 127.0.0.1 --port 5000
+# 7. Browse the logged runs in MLflow at http://127.0.0.1:5000
+uv run mlflow ui --backend-store-uri ./mlruns --host 127.0.0.1 --port 5000
 ```
 
-The exported audit starts as pending. After inspecting each item, record `review_status: rubric_review_completed`, a truthful `review_method`, and `review_notes`. The orchestrator checks that the reviewed answer still matches the frozen test reference. Automated validation alone is not a completed source review. Re-exporting the audit resets its review status.
+The prediction example uses the adapter selected in the measured run. After a new run, check `reports/selection.json` and use the adapter path recorded there.
 
-Individual commands are also available:
+**About the review step.** `audit` writes `reports/audit.json` with every test incident set to `pending`. After checking an incident against its log lines, set `review_status` to `rubric_review_completed` and fill in `review_method` and `review_notes`. `run-experiment` checks that every retained test incident is marked reviewed and its answer still matches the frozen reference. The status records a review; it cannot establish that a review was genuinely independent. Running `audit` again resets everything to `pending`.
 
-```powershell
-.venv\Scripts\python.exe -m ssh_log_analysis evaluate --system rules --split validation --output reports/rules_validation
-.venv\Scripts\python.exe -m ssh_log_analysis evaluate --system model --split validation --limit 20 --output reports/development_sample
-.venv\Scripts\python.exe -m ssh_log_analysis train --rank 16
-.venv\Scripts\python.exe -m ssh_log_analysis report
+### Individual commands
+
+```bash
+uv run python -m ssh_log_analysis evaluate --system rules --split validation --output reports/rules_validation
+uv run python -m ssh_log_analysis evaluate --system model --split validation --limit 20 --output reports/development_sample
+uv run python -m ssh_log_analysis train --rank 16
+uv run python -m ssh_log_analysis report
 ```
 
-To extend the existing frozen benchmark without training again:
+### The 200-incident test
 
-```powershell
-.venv\Scripts\python.exe -m ssh_log_analysis prepare-test-extension --total 200
-# Inspect every draft incident against its source and complete the local audit.
-.venv\Scripts\python.exe -m ssh_log_analysis evaluate-test-extension --total 200
+```bash
+uv run python -m ssh_log_analysis prepare-test-extension --total 200
+# Review every incident in data/test_extensions/total-200/audit.json, as above
+uv run python -m ssh_log_analysis evaluate-test-extension --total 200
 ```
 
-Preparation writes `draft.jsonl`, `audit.json`, a deterministic replacement reserve, and a source-selection manifest under `data/test_extensions/total-200`. It preserves an existing review queue when rerun. Each audit entry requires `review_status: rubric_review_completed`, `review_method`, and `review_notes`; source inspection and automated schema/evidence validation are recorded separately. Reviewed answers may correct the parser's draft. Do not mark entries reviewed without inspecting their source logs.
+This requires a completed original experiment and its selected rank-8 adapter. It uses the existing model and settings without retraining. Predictions are saved after every incident, so an interrupted run picks up where it stopped, as long as the data, model, adapter, prompt and decoding settings haven't changed.
 
-Evaluation checks reviewed reference lengths and freezes their fingerprints before producing predictions. If a reviewed answer exceeds the token budget, a deterministic replacement needs its own source review before evaluation can proceed. Predictions are saved after every incident. Rerunning the command resumes only when dataset, model revision, adapter, prompt, and decoding fingerprints match; stale caches and duplicate IDs are rejected. Original predictions are reused for combined scoring. The extension report and a linked local MLflow evaluation run are separate from the original experiment.
+### Running out of GPU memory
 
-Use `--source path/to/logs.txt` to prepare a local OpenSSH file, or `--sample` for the small public sample. The sample may not support the requested counts or broad class coverage.
+Lower `max_length` to 512 in [configs/train.json](configs/train.json) and rerun `uv run python -m ssh_log_analysis filter-data --max-length 512`. If that isn't enough, set the config model to `Qwen/Qwen3-0.6B` and filter with `--model Qwen/Qwen3-0.6B --max-length 512`. Treat either change as a new experiment: archive the previous outputs, refilter every split for the new model and length limit, complete the reference review, and rerun baselines, training and validation-based selection. Do not combine the new scores with the existing 93- or 200-incident results.
 
-## Training design
+## Repository layout
 
-- Qwen3-1.7B; completion-only SFT via TRL; PEFT adapters on attention and MLP projections.
-- Default model and tokenizer revision: `70d244cc86ccca08cf5af4e1e306ecf908b1ad5e`, matching the measured run.
-- QLoRA: NF4 original weights, double quantization, BF16 computation when supported, otherwise FP16.
-- Default rank 16, alpha 32, dropout 0.05, learning rate 0.0002, one epoch, microbatch 1, accumulation 8, seed 42.
-- Gradient checkpointing reduces activation memory. The original weights remain frozen; only adapters are optimized.
-- Maximum combined prompt/completion length is 1,024 tokens. Oversized incidents are excluded consistently from all systems, not truncated through their evidence.
-- Original and adapted models use the same prompt, quantization, deterministic decoding, and non-thinking chat template.
-- Validation inference batches four incidents to improve GPU utilization; its timing is amortized batch time. Final test inference uses batch size 1 for comparable request-latency measurements.
-- A rank-8 comparison runs only when the first full training run projects both runs within three hours. Selection uses validation exact-record accuracy, finding F1, schema validity, then validation loss. Test scores do not select the winner.
+```text
+src/ssh_log_analysis/
+  data.py              download logs, group into incidents, build splits
+  schema.py            output format and labeling rules
+  prompts.py           the prompt shared by training and testing
+  modeling.py          model loading, QLoRA training and inference
+  evaluation.py        scoring
+  experiment.py        runs the full experiment in order
+  extension.py         the 200-incident test extension
+  reporting.py         writes the results reports
+  tracking.py          MLflow logging
+  cli.py               command-line entry point
+configs/train.json     training settings
+tests/                 unit tests
+docs/                  methodology and labeling rubric
+reports/               metrics, results and training curves
+examples/              the made-up example incident
+```
 
-For memory exhaustion, first lower `max_length` to 512 in the config and rerun `filter-data --max-length 512`. If needed, switch the config and filtering to Qwen3-0.6B and repeat the original-model baseline. Do not combine old measurements with changed model/data settings; archive or remove stale experiment outputs first.
+Raw data, model weights, predictions and MLflow storage (`data/`, `artifacts/`, `mlruns/`) are not in Git. The commands regenerate these artifacts locally; annotation review is a separate required step. Hardware and software differences can change model results.
 
-## Results and artifacts
+`report` regenerates `reports/RESULTS.md`, and `evaluate-test-extension` regenerates `reports/EXTENDED_TEST_200.md`. Their generated wording can replace the edited prose in this repository; preserve a copy or review the Git diff after running them.
 
-The [measured comparison](reports/RESULTS.md) contains finding, field, outcome, evidence, formatting, latency, and GPU-memory results, plus the two training curves.
+## Credits
 
-See the [methodology](docs/METHODOLOGY.md) for dataset construction, model selection, evaluation design, and error analysis.
+**Data:** [Loghub OpenSSH](https://github.com/logpai/loghub/tree/master/OpenSSH), shared for research and academic use. Check [Loghub's license](https://github.com/logpai/loghub/blob/master/LICENSE) before any other use.
 
-- `data/raw`: downloaded source and checksums; `data/processed`: prepared partitions; `data/filtered`: frozen experiment partitions.
-- `data/test_extensions/total-200`: reviewed extension, manifests, incremental caches, new predictions, and failure records.
-- `artifacts`: smoke verification, checkpoints, trained adapters, and training histories.
-- `reports`: metrics, selected adapter, annotation audit, predictions, failure cases, and comparison report.
-- `mlruns`: local MLflow runs, parameters, losses, and artifact references.
+> Jieming Zhu, Shilin He, Pinjia He, Jinyang Liu, Michael R. Lyu. *Loghub: A Large Collection of System Log Datasets for AI-driven Log Analytics*. ISSRE, 2023.
 
-Raw data, predictions, audits, model weights, environments, and tracking storage are ignored by Git. Lightweight aggregate reports can be committed. Model weights are reproduced locally with the documented commands.
+**Model:** [Qwen3-1.7B](https://huggingface.co/Qwen/Qwen3-1.7B), Apache-2.0, pinned to revision `70d244cc86ccca08cf5af4e1e306ecf908b1ad5e`.
 
-## Evaluation limits
+**Libraries:** PyTorch, Hugging Face [Transformers](https://huggingface.co/docs/transformers/), [Datasets](https://huggingface.co/docs/datasets/), [PEFT](https://huggingface.co/docs/peft/) and [TRL](https://huggingface.co/docs/trl/), bitsandbytes and MLflow.
 
-The rule baseline is the labeling implementation, so perfect rule/reference agreement is circular and expected. It is not a claim of perfect real-world detection. This experiment measures adaptation to a documented extraction policy.
+## License
 
-The source is one historical lab server. Related duplicate families stay together, but event templates and some identities can appear in multiple partitions. The test is not an unseen-template, unseen-host, or independently expert-labeled benchmark. Balanced sampling also differs from production event prevalence.
-
-Canonical evidence F1 uses exact reference line IDs. Alternative supporting lines may lose canonical credit, so a separate supported-citation metric is recorded. Small class counts and malformed outputs are reported explicitly.
-
-A secondary content score removes only exact outer Markdown JSON fences. The primary score still rejects those responses. This diagnostic was defined on development validation data before final testing, to separate formatting compliance from extraction accuracy; it does not repair JSON or extract answers from surrounding prose.
-
-## Data and model attribution
-
-Dataset: [Loghub OpenSSH](https://github.com/logpai/loghub/tree/master/OpenSSH), provided for research/academic work. Consult [Loghub's terms](https://github.com/logpai/loghub/blob/master/LICENSE) before redistribution or other use. Download scripts retain source URLs and SHA-256 checksums; raw logs are not included in this repository.
-
-Jieming Zhu, Shilin He, Pinjia He, Jinyang Liu, Michael R. Lyu. *Loghub: A Large Collection of System Log Datasets for AI-driven Log Analytics*. ISSRE, 2023.
-
-Original model: [Qwen3-1.7B](https://huggingface.co/Qwen/Qwen3-1.7B), Apache-2.0. Training uses [TRL](https://huggingface.co/docs/trl/v0.23.1/en/sft_trainer) and [PEFT](https://huggingface.co/docs/peft/).
+The code is released under the [MIT License](LICENSE). The dataset and model keep their own licenses.

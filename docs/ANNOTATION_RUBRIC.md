@@ -1,30 +1,52 @@
-# Annotation rubric
+# Labeling rubric
 
-Version: observable_event_rules_v2. Annotate facts visible inside one prepared incident; do not add surrounding events from other partitions.
+Version: `observable_event_rules_v2`
 
-| Finding | Required observation |
+These are the rules used to write the correct answer for each incident. Label only what appears in the incident itself, and ignore anything from other incidents.
+
+## Findings
+
+| Finding | When to use it |
 |---|---|
-| invalid_user | Explicit Invalid user or input_userauth_request invalid-user event |
-| password_authentication_failed | Explicit Failed password event, including a repeated-message record |
-| authentication_accepted | Accepted password, publickey, or keyboard-interactive authentication |
-| too_many_authentication_failures | Explicit Too many authentication failures message |
-| connection_closed | Connection closed by, Received disconnect from, Disconnected from, or PAM session closed |
-| insufficient_evidence | No event in the five specific categories is established |
+| `invalid_user` | The log says `Invalid user`, or `input_userauth_request: invalid user` |
+| `password_authentication_failed` | The log says `Failed password`, including repeated-message lines |
+| `authentication_accepted` | The log says `Accepted password`, `Accepted publickey` or `Accepted keyboard-interactive` |
+| `too_many_authentication_failures` | The log says `Too many authentication failures` |
+| `connection_closed` | The log says `Connection closed by`, `Received disconnect from`, `Disconnected from`, or a PAM session closed |
+| `insufficient_evidence` | None of the five findings above appear |
 
-Multiple specific findings may coexist. `insufficient_evidence` is exclusive and means insufficient evidence for those specific categories; a generic PAM failure can still establish a failure outcome without establishing a password-specific finding.
+An incident can have several findings. `insufficient_evidence` is the exception and is always used on its own.
 
-Outcome: acceptance wins over earlier failures. Without acceptance, an explicit invalid user, password failure, excessive failures, or generic PAM authentication failure establishes `failure`. Closure, malformed protocol, missing identification strings, and reverse-DNS warnings alone leave authentication outcome `unknown`.
+## Outcome
 
-Extract a username, source IP, or hostname only when there is a unique supported value. A hostname in `rhost=` is not an IP address. An IPv4 address immediately before a disconnect-message colon is still an address. Multiple conflicting values result in `null`.
+- Any accepted login makes the outcome `success`, even if there were failures before it.
+- Otherwise, an invalid user, a failed password, too many failures or a generic PAM authentication failure makes it `failure`.
+- A closed connection, a protocol error, a missing identification string or a reverse-DNS warning on its own leaves the outcome as `unknown`.
 
-Cite the first line supporting each finding and deduplicate citations. If generic PAM failure alone establishes a failure outcome, include that line. For incidents outside the specific taxonomy, cite L1. All evidence IDs must exist in the supplied input.
+A generic PAM failure can set the outcome to `failure` without adding a password finding, because it doesn't say which method failed.
 
-No label establishes stolen credentials, malicious intent, password expiration, brute force intent, or compromise. Those conclusions require additional evidence and a different benchmark.
+## Usernames, IPs and hostnames
 
-## Audit process
+- Fill in an identity field only when the supported log context shows exactly one value. Extract source addresses from source contexts such as `from`, `by` and `rhost=`; a destination in a `connect_to` error is not a source IP.
+- If two different values appear, use `null`.
+- A hostname in `rhost=` is not an IP address.
+- An IPv4 address directly before a colon in a disconnect message still counts as an address.
 
-1. Read the source incident and confirm session boundaries are plausible.
-2. Check identity fields, every finding, outcome precedence, and canonical evidence.
-3. Check absent values and insufficient-evidence cases without guessing.
-4. Record the review method and corrections; do not call automated or assisted checks independent human expert validation.
-5. Freeze reference hashes before model scoring. A later reference correction invalidates the corresponding measurements and must be reported as a benchmark revision.
+## Evidence
+
+- For each finding, cite the first line that supports it, and don't list the same line twice.
+- If a generic PAM failure is the only thing that makes the outcome `failure`, cite that line too.
+- When no explicit finding or generic authentication-failure line supplies evidence, cite `L1` as the fallback for `insufficient_evidence`. If a generic failure is the only evidence, cite that failure line instead; `insufficient_evidence` can accompany a `failure` outcome because the authentication method is unspecified.
+- Every cited line must exist in the incident.
+
+## What the labels don't say
+
+No label claims stolen credentials, malicious intent, an expired password, a brute-force attack or a compromised system. Those would need more evidence and a different benchmark.
+
+## Review process
+
+1. Read the incident and check that the grouping of lines looks right.
+2. Check each field, each finding, the outcome and the cited lines.
+3. Check that empty values and `insufficient_evidence` are justified, without guessing.
+4. Record how the review was done and any corrections. Don't describe automated or tool-assisted checks as independent expert review.
+5. Freeze the answer hashes before scoring any model. If an answer is corrected afterwards, the affected results are no longer valid and the change has to be reported as a new benchmark version.
