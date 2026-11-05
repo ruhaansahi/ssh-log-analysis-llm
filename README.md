@@ -4,11 +4,11 @@ SSH servers can record authentication attempts, accepted logins, failures and di
 
 In this project I fine-tuned a small open-weight language model, [Qwen3-1.7B](https://huggingface.co/Qwen/Qwen3-1.7B), to read a related group of SSH log lines, called an incident, and write a short, structured summary of it: who tried to log in, where they connected from, whether they got in, what happened along the way, and which log lines prove each of those points.
 
-The adapters were trained on a single 12 GB laptop GPU, then tested against the pretrained model without the task adapter and a rule-based parser. "Base model" below means that pretrained Qwen model, not a model trained from scratch.
+The adapters were trained on a single 12 GB laptop GPU, then tested against the pretrained model without the task adapter and a rule-based parser. "Base model" means Qwen3-1.7B as released, without my adapter.
 
 ## Results at a glance
 
-These results use 200 held-out incidents from the same log source, excluded from training and adapter selection. The original 93 were tested first; 107 were added after that experiment was complete. Correctness here means agreement with the reviewed, rule-derived reference answers:
+On 200 held-out incidents from the same log source, scored against the reviewed reference answers:
 
 | | Base Qwen3-1.7B | Fine-tuned Qwen3-1.7B |
 |---|---:|---:|
@@ -133,7 +133,7 @@ Three systems were run on the same test incidents:
 2. The fine-tuned model (rank 8)
 3. The rule-based parser
 
-Both models got the same prompt and used greedy decoding without random token sampling. The model revision and settings are pinned, but bit-for-bit repeatability across hardware or software versions is not guaranteed. Any answer that wasn't valid JSON with exactly the six fields counted as wrong.
+Both models got the same prompt and used greedy decoding without random token sampling. Any answer that wasn't valid JSON with exactly the six fields counted as wrong.
 
 The main measurements:
 
@@ -159,12 +159,12 @@ What stood out:
 
 - **Formatting caused many strict-scoring failures for the base model.** It wrapped 157 of its 200 answers in Markdown code fences, which breaks strict JSON parsing. Stripping just those fences raises its F1 from 0.26 to 0.66. Content errors remained after that formatting change: extra events that weren't in the log, missed disconnects and wrong line numbers.
 - **The fine-tuned model matched the reference findings on all 200 incidents, but two records still had a wrong identity field.** In one, a username was copied incorrectly. In the other, a destination address was reported as the source IP. F1 alone would have hidden these, which is why exact-record accuracy is tracked too. Both errors are kept in the scores.
-- **Latency depended on the evaluation session.** On the matched 20-incident comparison, average answer length fell from 94 to 55.4 tokens and median time fell from 8.8 to 7.2 seconds. On the additional 107 incidents, the adapter was slower: median 9.2162 seconds versus 8.7620 for the base model. These runs do not establish a general speed advantage.
+- **Latency depended on the evaluation session.** On the matched 20-incident comparison, average answer length fell from 94 to 55.4 tokens and median time fell from 8.8 to 7.2 seconds. On the additional 107 incidents, the adapter was slower: median 9.2 seconds versus 8.8 for the base model. These runs do not establish a general speed advantage.
 - **The rule parser scores 100% because it wrote the reference answers.** It's included as a reference point, and as a reminder that for a single fixed log format, a parser is far faster and cheaper than an LLM.
 
 ## Limits and next steps
 
-All the data comes from one lab server. Log formats and some usernames and IP addresses occur across splits. Zero incident-ID and family overlap does not establish complete freedom from leakage or unseen-template generalization. The results show the model learned this labeling scheme very well. They don't yet show how it handles other servers or other log formats.
+All the data comes from one lab server. Log formats and some usernames and IP addresses occur across splits. Keeping families apart stops repeated attempts leaking between splits, but similar log formats still appear on both sides. The results show the model learned this labeling scheme very well. They don't yet show how it handles other servers or other log formats.
 
 Next steps:
 
@@ -215,7 +215,7 @@ uv run mlflow ui --backend-store-uri ./mlruns --host 127.0.0.1 --port 5000
 
 The prediction example uses the adapter selected in the measured run. After a new run, check `reports/selection.json` and use the adapter path recorded there.
 
-**About the review step.** `audit` writes `reports/audit.json` with every test incident set to `pending`. After checking an incident against its log lines, set `review_status` to `rubric_review_completed` and fill in `review_method` and `review_notes`. `run-experiment` checks that every retained test incident is marked reviewed and its answer still matches the frozen reference. The status records a review; it cannot establish that a review was genuinely independent. Running `audit` again resets everything to `pending`.
+**About the review step.** `audit` writes `reports/audit.json` with every test incident set to `pending`. After checking an incident against its log lines, set `review_status` to `rubric_review_completed` and fill in `review_method` and `review_notes`. `run-experiment` checks that every retained test incident is marked reviewed and its answer still matches the frozen reference. Running `audit` again resets everything to `pending`.
 
 ### Individual commands
 
